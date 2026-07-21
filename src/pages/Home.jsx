@@ -13,9 +13,9 @@ export default function Home() {
           📖 포켓몬 도감
           <div style={subStyle}>전체 목록 · 가나다순 · 검색</div>
         </Link>
-        <Link to="/quiz/silhouette" style={cardStyle}>
-          🕶️ 실루엣 퀴즈
-          <div style={subStyle}>이 포켓몬은 누구일까요?</div>
+        <Link to="/quiz" style={cardStyle}>
+          🎮 퀴즈 바로가기
+          <div style={subStyle}>실루엣 · 울음소리 · 초성 퀴즈</div>
         </Link>
       </div>
 
