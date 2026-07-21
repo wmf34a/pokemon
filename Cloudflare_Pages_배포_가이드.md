@@ -37,13 +37,10 @@ Cloudflare가 자동으로 Vite 프로젝트를 감지하지만, 아래 값을 �
 | Build output directory | `dist` |
 | Root directory | `/` (레포 루트에 package.json이 있는 경우) |
 
-**Node 버전**: 프로젝트 루트에 `.nvmrc` 또는 환경 변수 `NODE_VERSION=20`을 추가하면
-빌드 환경의 Node 버전을 고정할 수 있습니다 (권장).
-
-```bash
-echo "20" > .nvmrc
-git add .nvmrc && git commit -m "chore: pin node version" && git push
-```
+**Node 버전**: `wrangler`/`lint-staged` 등 일부 개발 도구가 Node 22 이상을
+요구하므로, 이 저장소는 `.nvmrc`에 `22`를 고정해두었습니다. Cloudflare Pages
+빌드 환경도 이 `.nvmrc`를 자동으로 인식하므로 별도 설정은 필요 없습니다
+(직접 지정하려면 환경 변수 `NODE_VERSION=22`를 추가하면 됩니다).
 
 ## 3. 배포
 
@@ -106,7 +103,7 @@ push하면 Cloudflare Pages가 자동으로 다시 빌드/배포합니다.
 | 증상 | 원인/해결 |
 |---|---|
 | 배포된 사이트에서 도감이 비어있음 | `public/data/pokemon.json`을 커밋하지 않음 → 0단계 다시 확인 |
-| 빌드 실패 (Node 버전 오류) | `.nvmrc` 또는 `NODE_VERSION` 환경변수로 Node 20 이상 고정 |
+| 빌드 실패 (Node 버전 오류) | `.nvmrc` 또는 `NODE_VERSION` 환경변수로 Node 22 이상 고정 |
 | 이미지가 하나도 안 보임 | 네트워크 문제로 PokeAPI 이미지 URL이 느릴 수 있음 (핫링크 방식이라 정상, 재시도하면 대부분 해결) |
 | 새 커밋을 push했는데 사이트가 그대로임 | Cloudflare Pages 대시보드의 **Deployments** 탭에서 빌드 상태 확인, 실패 시 로그 확인 |
 
