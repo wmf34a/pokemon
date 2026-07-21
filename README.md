@@ -33,7 +33,8 @@ npm run dev
 npm run build
 ```
 
-`dist/` 폴더가 생성됩니다. 이 폴더를 Cloudflare Pages 등 정적 호스팅에 올리면 됩니다.
+`dist/` 폴더가 생성됩니다. `wrangler.jsonc` 설정에 따라 Cloudflare Workers
+(Static Assets)로 배포됩니다.
 
 ## 5. 개발 스크립트 모음 (Makefile)
 
@@ -46,7 +47,7 @@ make test        # vitest 실행 (1회)
 make test-watch  # vitest watch 모드
 make build       # 프로덕션 빌드
 make ci          # lint + test + build (CI와 동일한 체크를 로컬에서)
-make deploy      # dist/ 를 Cloudflare Pages로 즉시 배포 (최초 1회 npx wrangler login 필요)
+make deploy      # Cloudflare Workers로 즉시 배포 (최초 1회 npx wrangler login 필요)
 ```
 
 ## 6. 품질 도구
@@ -82,9 +83,11 @@ src/utils/pokemonData.js          # 데이터 로드/정렬/타입 라벨 유틸
 - [ ] 타입 상성 퀴즈 / 진화 순서 맞추기 / 도감번호 업다운 (기획안의 추가 게임모드 — `src/pages/QuizHub.jsx`에 "준비중"으로 자리만 잡아둠. 기존 퀴즈 페이지들을 참고해 같은 패턴으로 추가 가능)
 - [ ] 컬렉션/스트릭 등 기록 저장 (localStorage 활용 예정)
 
-## Cloudflare Pages 배포
+## Cloudflare Workers 배포
 
-빌드 명령어 `npm run build`, 빌드 출력 디렉터리 `dist` 로 설정하면 됩니다.
+`wrangler.jsonc`에 Worker 이름/Static Assets 설정이 들어있습니다.
+GitHub 저장소를 Cloudflare Workers Builds에 연결하면 push 시 자동 배포되고,
+로컬에서 즉시 배포하려면 `make deploy`를 사용하세요.
 자세한 단계는 별도 배포 가이드 문서를 참고하세요.
 
 ## 저작권 안내
