@@ -4,6 +4,7 @@ import {
   loadPokemonData,
   pickRandom,
   TYPE_LABEL_KO,
+  applyGen1OnlyFilter,
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
 
@@ -28,7 +29,7 @@ export default function SilhouetteQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(data);
+      setAll(applyGen1OnlyFilter(data));
     });
   }, []);
 
@@ -104,6 +105,12 @@ export default function SilhouetteQuiz() {
         />
       </div>
 
+      {!revealed && hintLevel < HINT_STEPS.length && (
+        <button onClick={showNextHint} style={secondaryBtn}>
+          힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
+        </button>
+      )}
+
       <div style={{ minHeight: 70, fontSize: 14, color: "#444" }}>
         {hintLevel >= 1 && (
           <p>
@@ -124,12 +131,6 @@ export default function SilhouetteQuiz() {
           </p>
         )}
       </div>
-
-      {!revealed && hintLevel < HINT_STEPS.length && (
-        <button onClick={showNextHint} style={secondaryBtn}>
-          힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
-        </button>
-      )}
 
       {!revealed && (
         <div style={{ margin: "16px 0" }}>
@@ -181,7 +182,9 @@ export default function SilhouetteQuiz() {
           <p>
             정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
           </p>
-          {answer.cry && <audio controls autoPlay src={answer.cry} />}
+          {answer.cry && (
+            <audio key={answer.id} controls autoPlay src={answer.cry} />
+          )}
           <p style={{ fontSize: 13, color: "#666", marginTop: 8 }}>
             {answer.descriptionKo || answer.descriptionEn}
           </p>

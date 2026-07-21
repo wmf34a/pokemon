@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { getGen1OnlyPref, setGen1OnlyPref } from "../utils/pokemonData";
 
 const MODES = [
   { key: "silhouette", emoji: "🕶️", title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", ready: true },
@@ -10,10 +12,36 @@ const MODES = [
 ];
 
 export default function QuizHub() {
+  const [gen1Only, setGen1Only] = useState(() => getGen1OnlyPref());
+
+  function toggleGen1Only(e) {
+    const checked = e.target.checked;
+    setGen1Only(checked);
+    setGen1OnlyPref(checked);
+  }
+
   return (
     <div style={{ padding: 20, maxWidth: 720, margin: "0 auto" }}>
       <Link to="/">← 홈</Link>
       <h1 style={{ fontSize: 24, margin: "12px 0" }}>퀴즈 모드 선택</h1>
+
+      <label
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 14px",
+          borderRadius: 999,
+          border: "1px solid #ddd",
+          marginBottom: 16,
+          cursor: "pointer",
+          fontSize: 14,
+        }}
+      >
+        <input type="checkbox" checked={gen1Only} onChange={toggleGen1Only} />
+        1세대(#1~#151) 포켓몬만 출제
+      </label>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
         {MODES.map((m) => (
           <Link

@@ -4,6 +4,7 @@ import {
   loadPokemonData,
   pickRandom,
   TYPE_LABEL_KO,
+  applyGen1OnlyFilter,
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
 
@@ -24,7 +25,7 @@ export default function CryQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(data.filter((p) => p.cry));
+      setAll(applyGen1OnlyFilter(data.filter((p) => p.cry)));
     });
   }, []);
 
@@ -93,7 +94,7 @@ export default function CryQuiz() {
         {round}번째 문제 · 점수 {score}점
       </p>
 
-      <audio ref={audioRef} src={answer.cry} />
+      <audio key={answer.id} ref={audioRef} src={answer.cry} />
 
       <div
         style={{
@@ -123,6 +124,12 @@ export default function CryQuiz() {
         </button>
       </div>
 
+      {!revealed && hintLevel < HINT_STEPS.length && (
+        <button onClick={showNextHint} style={hintBtn}>
+          힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
+        </button>
+      )}
+
       <div style={{ minHeight: 70, fontSize: 14, color: "#444" }}>
         {hintLevel >= 1 && (
           <p>
@@ -138,12 +145,6 @@ export default function CryQuiz() {
           </p>
         )}
       </div>
-
-      {!revealed && hintLevel < HINT_STEPS.length && (
-        <button onClick={showNextHint} style={hintBtn}>
-          힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
-        </button>
-      )}
 
       {!revealed && (
         <div style={{ margin: "16px 0" }}>

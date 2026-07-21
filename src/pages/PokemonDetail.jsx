@@ -43,7 +43,7 @@ export default function PokemonDetail() {
           <div>
             <b>울음소리</b>
             <br />
-            <audio controls src={p.cry} />
+            <audio key={p.id} controls src={p.cry} />
           </div>
         )}
       </div>

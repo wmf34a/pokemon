@@ -92,3 +92,29 @@ export function pickRandom(list, n = 1) {
   }
   return out;
 }
+
+// 퀴즈 문제 출제 범위를 1세대(#1~#151)로 제한하는 설정. localStorage에 저장해
+// 퀴즈 허브에서 켜고 끄면 이후 모든 퀴즈 모드에 반영되도록 함.
+const GEN1_ONLY_KEY = "pokemonQuiz.gen1Only";
+
+export function getGen1OnlyPref() {
+  try {
+    return localStorage.getItem(GEN1_ONLY_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setGen1OnlyPref(value) {
+  try {
+    localStorage.setItem(GEN1_ONLY_KEY, value ? "1" : "0");
+  } catch {
+    // localStorage 접근 불가 환경(시크릿 모드 등)에서는 조용히 무시
+  }
+}
+
+export function applyGen1OnlyFilter(list) {
+  return getGen1OnlyPref()
+    ? list.filter((p) => p.generation === "generation-i")
+    : list;
+}
