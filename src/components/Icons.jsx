@@ -210,6 +210,16 @@ export function TrophyIcon(props) {
   );
 }
 
+export function InstallIcon(props) {
+  return (
+    <Base {...props}>
+      <rect x="5" y="2.5" width="14" height="19" rx="2.5" />
+      <path d="M12 7v7M8.5 11 12 14.5 15.5 11" />
+      <path d="M9 18.5h6" />
+    </Base>
+  );
+}
+
 export function SparklesIcon(props) {
   return (
     <Base {...props}>

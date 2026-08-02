@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { ChevronLeftIcon, HomeIcon, BookIcon, GamepadIcon } from "./Icons";
+import InstallBanner from "./InstallBanner";
 
 const NAV_ITEMS = [
   { to: "/", label: "홈", icon: HomeIcon, match: (p) => p === "/" },
@@ -111,6 +112,7 @@ function BottomNav() {
 export default function AppShell({ title, backTo, children, hideNav }) {
   return (
     <div style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
+      <InstallBanner />
       {title !== undefined && <TopBar title={title} backTo={backTo} />}
       <main
         style={{
