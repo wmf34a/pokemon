@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import AppShell from "../components/AppShell";
 import { getGen1OnlyPref, setGen1OnlyPref } from "../utils/pokemonData";
+import {
+  GlassesIcon,
+  VolumeIcon,
+  PuzzleIcon,
+  SwordsIcon,
+  ShuffleIcon,
+  HashIcon,
+} from "../components/Icons";
 
 const MODES = [
-  { key: "silhouette", emoji: "🕶️", title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", ready: true },
-  { key: "cry", emoji: "🔊", title: "울음소리 퀴즈", desc: "소리만 듣고 맞히기", ready: true },
-  { key: "chosung", emoji: "🔤", title: "초성 퀴즈", desc: "초성 + 특징으로 맞히기", ready: true },
-  { key: "type", emoji: "⚔️", title: "타입 상성 퀴즈", desc: "효과가 굉장한 타입 고르기", ready: false },
-  { key: "evolution", emoji: "🔁", title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", ready: false },
-  { key: "updown", emoji: "🔢", title: "도감번호 업다운", desc: "숫자야구 스타일", ready: false },
+  { key: "silhouette", icon: GlassesIcon, title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", ready: true },
+  { key: "cry", icon: VolumeIcon, title: "울음소리 퀴즈", desc: "소리만 듣고 맞히기", ready: true },
+  { key: "chosung", icon: PuzzleIcon, title: "초성 퀴즈", desc: "초성 + 특징으로 맞히기", ready: true },
+  { key: "type", icon: SwordsIcon, title: "타입 상성 퀴즈", desc: "효과가 굉장한 타입 고르기", ready: false },
+  { key: "evolution", icon: ShuffleIcon, title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", ready: false },
+  { key: "updown", icon: HashIcon, title: "도감번호 업다운", desc: "숫자야구 스타일", ready: false },
 ];
 
 export default function QuizHub() {
@@ -21,23 +30,20 @@ export default function QuizHub() {
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 720, margin: "0 auto" }}>
-      <Link to="/">← 홈</Link>
-      <h1 style={{ fontSize: 24, margin: "12px 0" }}>퀴즈 모드 선택</h1>
-
+    <AppShell title="퀴즈 모드 선택" backTo="/">
       <label
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 16,
-          padding: "18px 20px",
-          borderRadius: 18,
-          border: gen1Only ? "2px solid #1F3864" : "2px solid #e5e5e5",
-          background: gen1Only ? "#EAF0FA" : "#fff",
-          marginBottom: 20,
-          cursor: "pointer",
-          transition: "background .15s, border-color .15s",
+          padding: "var(--space-4) var(--space-5)",
+          borderRadius: "var(--radius-lg)",
+          border: gen1Only ? "2px solid var(--color-primary)" : "2px solid var(--color-border)",
+          background: gen1Only
+            ? "color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))"
+            : "var(--color-surface)",
+          marginBottom: "var(--space-5)",
         }}
       >
         <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -47,16 +53,16 @@ export default function QuizHub() {
             style={{ width: 32, height: 32, flexShrink: 0 }}
           />
           <span>
-            <div style={{ fontWeight: 800, fontSize: 17, color: "#1F3864" }}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: "var(--color-primary)" }}>
               1세대 포켓몬만 출제
             </div>
-            <div style={{ fontSize: 13, color: "#777", marginTop: 2 }}>
+            <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 2 }}>
               #001 ~ #151 (총 151마리)
             </div>
           </span>
         </span>
 
-        <span style={{ position: "relative", width: 56, height: 32, flexShrink: 0 }}>
+        <span style={{ position: "relative", width: 52, height: 30, flexShrink: 0 }}>
           <input
             type="checkbox"
             checked={gen1Only}
@@ -68,7 +74,6 @@ export default function QuizHub() {
               height: "100%",
               margin: 0,
               opacity: 0,
-              cursor: "pointer",
               zIndex: 1,
             }}
           />
@@ -76,50 +81,75 @@ export default function QuizHub() {
             style={{
               position: "absolute",
               inset: 0,
-              borderRadius: 999,
-              background: gen1Only ? "#1F3864" : "#ccc",
-              transition: "background .15s",
+              borderRadius: "var(--radius-pill)",
+              background: gen1Only ? "var(--color-primary)" : "var(--color-border)",
+              transition: "background 150ms ease",
             }}
           />
           <span
             style={{
               position: "absolute",
               top: 3,
-              left: gen1Only ? 27 : 3,
-              width: 26,
-              height: 26,
+              left: gen1Only ? 25 : 3,
+              width: 24,
+              height: 24,
               borderRadius: "50%",
               background: "#fff",
               boxShadow: "0 1px 4px rgba(0,0,0,.35)",
-              transition: "left .15s",
+              transition: "left 150ms ease",
             }}
           />
         </span>
       </label>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-        {MODES.map((m) => (
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
+        {MODES.map(({ key, icon: Icon, title, desc, ready }) => (
           <Link
-            key={m.key}
-            to={m.ready ? `/quiz/${m.key}` : "#"}
-            onClick={(e) => !m.ready && e.preventDefault()}
+            key={key}
+            to={ready ? `/quiz/${key}` : "#"}
+            onClick={(e) => !ready && e.preventDefault()}
+            aria-disabled={!ready}
+            tabIndex={ready ? 0 : -1}
+            className={ready ? "press" : undefined}
             style={{
-              padding: 16,
-              borderRadius: 14,
-              border: "1px solid #eee",
+              padding: "var(--space-4)",
+              minHeight: 130,
+              borderRadius: "var(--radius-lg)",
+              border: "1px solid var(--color-border)",
               textDecoration: "none",
-              color: "#222",
-              background: m.ready ? "#fff" : "#f5f5f5",
-              opacity: m.ready ? 1 : 0.6,
+              color: "var(--color-text)",
+              background: ready ? "var(--color-surface)" : "var(--color-surface-2)",
+              boxShadow: ready ? "var(--shadow-card)" : "none",
+              opacity: ready ? 1 : 0.6,
+              cursor: ready ? "pointer" : "default",
             }}
           >
-            <div style={{ fontSize: 26 }}>{m.emoji}</div>
-            <div style={{ fontWeight: 700, marginTop: 4 }}>{m.title}</div>
-            <div style={{ fontSize: 13, color: "#888" }}>{m.desc}</div>
-            {!m.ready && <div style={{ fontSize: 12, color: "#bbb", marginTop: 6 }}>준비중</div>}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: ready
+                  ? "color-mix(in srgb, var(--color-accent) 30%, transparent)"
+                  : "var(--color-border)",
+                color: ready ? "var(--color-accent-ink)" : "var(--color-text-muted)",
+              }}
+            >
+              <Icon size={20} />
+            </div>
+            <div style={{ fontWeight: 700, marginTop: 8 }}>{title}</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{desc}</div>
+            {!ready && (
+              <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 6 }}>
+                준비중
+              </div>
+            )}
           </Link>
         ))}
       </div>
-    </div>
+    </AppShell>
   );
 }

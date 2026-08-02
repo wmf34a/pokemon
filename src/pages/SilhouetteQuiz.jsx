@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import AppShell from "../components/AppShell";
+import AudioButton from "../components/AudioButton";
+import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
@@ -7,6 +9,7 @@ import {
   applyGen1OnlyFilter,
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
+import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 
 const HINT_STEPS = ["type", "color", "chosung"];
 const COLOR_LABEL_KO = {
@@ -50,7 +53,13 @@ export default function SilhouetteQuiz() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all]);
 
-  if (!answer) return <div style={{ padding: 20 }}>불러오는 중...</div>;
+  if (!answer) {
+    return (
+      <AppShell title="실루엣 퀴즈" backTo="/quiz">
+        <div className="skeleton" style={{ height: 220 }} />
+      </AppShell>
+    );
+  }
 
   function submitChoice(p) {
     const isCorrect = p.id === answer.id;
@@ -77,169 +86,148 @@ export default function SilhouetteQuiz() {
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
-      <Link to="/quiz">← 퀴즈 목록</Link>
-      <h1 style={{ fontSize: 22, margin: "10px 0" }}>🕶️ 실루엣 퀴즈</h1>
-      <p style={{ fontSize: 13, color: "#888" }}>
-        {round}번째 문제 · 점수 {score}점
-      </p>
+    <AppShell title="실루엣 퀴즈" backTo="/quiz">
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
+          {round}번째 문제 · 점수 {score}점
+        </p>
 
-      <div
-        style={{
-          background: "#f2f2f2",
-          borderRadius: 16,
-          padding: 20,
-          margin: "12px 0",
-        }}
-      >
-        <img
-          src={answer.artwork}
-          alt="누구일까요"
+        <div
           style={{
-            width: 180,
-            height: 180,
-            objectFit: "contain",
-            filter: revealed ? "none" : "brightness(0)",
-            transition: "filter .4s",
+            background: "var(--color-surface-2)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-5)",
+            margin: "var(--space-3) 0",
           }}
-        />
-      </div>
+        >
+          <img
+            src={answer.artwork}
+            alt="누구일까요"
+            style={{
+              width: 180,
+              height: 180,
+              objectFit: "contain",
+              filter: revealed ? "none" : "brightness(0)",
+              transition: "filter .4s",
+            }}
+          />
+        </div>
 
-      {!revealed && hintLevel < HINT_STEPS.length && (
-        <button onClick={showNextHint} style={secondaryBtn}>
-          힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
-        </button>
-      )}
-
-      <div style={{ minHeight: 70, fontSize: 14, color: "#444" }}>
-        {hintLevel >= 1 && (
-          <p>
-            💡 이 포켓몬의 타입은{" "}
-            <b>{answer.types.map((t) => TYPE_LABEL_KO[t] || t).join(", ")}</b>{" "}
-            입니다.
-          </p>
+        {!revealed && hintLevel < HINT_STEPS.length && (
+          <button onClick={showNextHint} style={hintBtn}>
+            <LightbulbIcon size={16} />
+            힌트 더보기 ({hintLevel}/{HINT_STEPS.length})
+          </button>
         )}
-        {hintLevel >= 2 && (
-          <p>
-            🎨 대표 색상은 <b>{COLOR_LABEL_KO[answer.color] || answer.color}</b>{" "}
-            입니다.
-          </p>
-        )}
-        {hintLevel >= 3 && (
-          <p>
-            🔤 이름 초성은 <b>{getChosung(answer.nameKo)}</b> 입니다.
-          </p>
-        )}
-      </div>
 
-      {!revealed && (
-        <div style={{ margin: "16px 0" }}>
-          <div style={{ marginBottom: 8 }}>
-            <button
-              onClick={() => setMode("choice")}
-              style={pill(mode === "choice")}
-            >
-              객관식 (아이 모드)
-            </button>
-            <button
-              onClick={() => setMode("typed")}
-              style={pill(mode === "typed")}
-            >
-              주관식 (성인 모드)
-            </button>
-          </div>
+        <div style={{ minHeight: 70, fontSize: 14, color: "var(--color-text)" }}>
+          {hintLevel >= 1 && (
+            <HintLine>
+              이 포켓몬의 타입은{" "}
+              <b>{answer.types.map((t) => TYPE_LABEL_KO[t] || t).join(", ")}</b>{" "}
+              입니다.
+            </HintLine>
+          )}
+          {hintLevel >= 2 && (
+            <HintLine>
+              대표 색상은 <b>{COLOR_LABEL_KO[answer.color] || answer.color}</b>{" "}
+              입니다.
+            </HintLine>
+          )}
+          {hintLevel >= 3 && (
+            <HintLine>
+              이름 초성은 <b>{getChosung(answer.nameKo)}</b> 입니다.
+            </HintLine>
+          )}
+        </div>
 
-          {mode === "choice" ? (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {choices.map((c) => (
-                <button key={c.id} onClick={() => submitChoice(c)} style={choiceBtn}>
-                  {c.nameKo}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                value={typedGuess}
-                onChange={(e) => setTypedGuess(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submitTyped()}
-                placeholder="포켓몬 이름을 입력하세요"
-                style={{ flex: 1, padding: 10, borderRadius: 8, border: "1px solid #ddd" }}
-              />
-              <button onClick={submitTyped} style={primaryBtn}>
-                제출
+        {!revealed && (
+          <div style={{ margin: "var(--space-4) 0" }}>
+            <div style={{ marginBottom: 8 }}>
+              <button onClick={() => setMode("choice")} style={pill(mode === "choice")}>
+                객관식 (아이 모드)
+              </button>
+              <button onClick={() => setMode("typed")} style={pill(mode === "typed")}>
+                주관식 (성인 모드)
               </button>
             </div>
-          )}
-        </div>
-      )}
 
-      {revealed && (
-        <div style={{ marginTop: 16 }}>
-          <h2 style={{ color: correct ? "#2e7d32" : "#c62828" }}>
-            {correct ? "정답입니다! 🎉" : "아쉬워요!"}
-          </h2>
-          <p>
-            정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
-          </p>
-          {answer.cry && (
-            <audio key={answer.id} controls autoPlay src={answer.cry} />
-          )}
-          <p style={{ fontSize: 13, color: "#666", marginTop: 8 }}>
-            {answer.descriptionKo || answer.descriptionEn}
-          </p>
-          <button onClick={nextRound} style={primaryBtn}>
-            다음 문제 →
-          </button>
-        </div>
-      )}
-    </div>
+            {mode === "choice" ? (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {choices.map((c) => (
+                  <button key={c.id} onClick={() => submitChoice(c)} style={choiceBtn}>
+                    {c.nameKo}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={typedGuess}
+                  onChange={(e) => setTypedGuess(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitTyped()}
+                  placeholder="포켓몬 이름을 입력하세요"
+                  style={textInput}
+                />
+                <button onClick={submitTyped} style={primaryBtn}>
+                  제출
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {revealed && (
+          <div style={{ marginTop: 16 }}>
+            <ResultHeading correct={correct} />
+            <p>
+              정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
+            </p>
+            {answer.cry && (
+              <div style={{ margin: "10px 0" }}>
+                <AudioButton src={answer.cry} trackKey={answer.id} autoPlay label="울음소리 듣기" />
+              </div>
+            )}
+            <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 8 }}>
+              {answer.descriptionKo || answer.descriptionEn}
+            </p>
+            <button onClick={nextRound} style={primaryBtn}>
+              다음 문제 →
+            </button>
+          </div>
+        )}
+      </div>
+    </AppShell>
+  );
+}
+
+function HintLine({ children }) {
+  return (
+    <p style={{ display: "flex", alignItems: "flex-start", gap: 6, textAlign: "left" }}>
+      <LightbulbIcon size={16} style={{ flexShrink: 0, marginTop: 2, color: "var(--color-text-muted)" }} />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+function ResultHeading({ correct }) {
+  const Icon = correct ? CheckIcon : XCircleIcon;
+  return (
+    <h2
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        color: correct ? "var(--color-success)" : "var(--color-danger)",
+      }}
+    >
+      <Icon size={24} />
+      {correct ? "정답입니다!" : "아쉬워요!"}
+    </h2>
   );
 }
 
 function shuffle(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
-}
-
-const choiceBtn = {
-  padding: "12px 8px",
-  borderRadius: 10,
-  border: "1px solid #ddd",
-  background: "#fff",
-  fontSize: 15,
-  cursor: "pointer",
-};
-
-const primaryBtn = {
-  padding: "10px 18px",
-  borderRadius: 10,
-  border: "none",
-  background: "#1F3864",
-  color: "#fff",
-  fontWeight: 700,
-  cursor: "pointer",
-  marginTop: 10,
-};
-
-const secondaryBtn = {
-  padding: "8px 14px",
-  borderRadius: 10,
-  border: "1px solid #F2C31A",
-  background: "#FFF7DD",
-  color: "#7a5c00",
-  cursor: "pointer",
-  marginBottom: 8,
-};
-
-function pill(active) {
-  return {
-    padding: "6px 12px",
-    borderRadius: 999,
-    border: active ? "2px solid #1F3864" : "1px solid #ddd",
-    background: active ? "#1F3864" : "#fff",
-    color: active ? "#fff" : "#333",
-    fontSize: 12,
-    marginRight: 6,
-    cursor: "pointer",
-  };
 }

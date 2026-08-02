@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { loadPokemonData } from "../utils/pokemonData";
+import AppShell from "../components/AppShell";
+import { loadPokemonData, TYPE_COLOR } from "../utils/pokemonData";
 import TypeBadge from "../components/TypeBadge";
+import AudioButton from "../components/AudioButton";
+import { GlassesIcon } from "../components/Icons";
 
 export default function PokemonDetail() {
   const { id } = useParams();
@@ -13,16 +16,36 @@ export default function PokemonDetail() {
     });
   }, [id]);
 
-  if (!p) return <div style={{ padding: 20 }}>불러오는 중...</div>;
+  if (!p) {
+    return (
+      <AppShell title="포켓몬 도감" backTo="/dex">
+        <div className="skeleton" style={{ height: 220, marginBottom: 16 }} />
+        <div className="skeleton" style={{ height: 20, width: "60%", margin: "0 auto 8px" }} />
+        <div className="skeleton" style={{ height: 100 }} />
+      </AppShell>
+    );
+  }
+
+  const tint = TYPE_COLOR[p.types[0]] || "#999";
 
   return (
-    <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
-      <Link to="/dex">← 도감으로</Link>
-      <div style={{ textAlign: "center", marginTop: 12 }}>
-        <img src={p.artwork} alt={p.nameKo} style={{ width: 200 }} />
-        <div style={{ color: "#999" }}>#{String(p.id).padStart(4, "0")}</div>
-        <h1>{p.nameKo}</h1>
-        <div style={{ color: "#666", marginBottom: 8 }}>{p.genusKo}</div>
+    <AppShell title={p.nameKo} backTo="/dex">
+      <div
+        style={{
+          textAlign: "center",
+          borderRadius: "var(--radius-lg)",
+          padding: "var(--space-6) var(--space-4) var(--space-4)",
+          background: `color-mix(in srgb, ${tint} 18%, var(--color-surface))`,
+        }}
+      >
+        <img src={p.artwork} alt={p.nameKo} style={{ width: 180, height: 180 }} />
+        <div style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
+          #{String(p.id).padStart(4, "0")}
+        </div>
+        <h1 style={{ fontSize: 26, marginTop: 2 }}>{p.nameKo}</h1>
+        <div style={{ color: "var(--color-text-muted)", marginBottom: 8, fontSize: 14 }}>
+          {p.genusKo}
+        </div>
         <div>
           {p.types.map((t) => (
             <TypeBadge key={t} type={t} />
@@ -30,39 +53,82 @@ export default function PokemonDetail() {
         </div>
       </div>
 
-      <div style={{ marginTop: 20, lineHeight: 1.7 }}>
-        <p>
-          <b>키</b> {p.height}m &nbsp;&nbsp; <b>몸무게</b> {p.weight}kg
-        </p>
-        <p>
-          <b>특성</b> {p.abilities.join(", ")}
-        </p>
-        <p>{p.descriptionKo || p.descriptionEn}</p>
-
-        {p.cry && (
-          <div>
-            <b>울음소리</b>
-            <br />
-            <audio key={p.id} controls src={p.cry} />
-          </div>
-        )}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, margin: "var(--space-4) 0" }}>
+        <StatBox label="키" value={`${p.height}m`} />
+        <StatBox label="몸무게" value={`${p.weight}kg`} />
       </div>
+
+      <Section label="특성">
+        <p style={{ margin: 0 }}>{p.abilities.join(", ")}</p>
+      </Section>
+
+      <Section label="설명">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>{p.descriptionKo || p.descriptionEn}</p>
+      </Section>
+
+      {p.cry && (
+        <Section label="울음소리">
+          <AudioButton src={p.cry} trackKey={p.id} />
+        </Section>
+      )}
 
       <Link
         to="/quiz/silhouette"
+        className="press pop-card"
         style={{
-          display: "inline-block",
-          marginTop: 20,
-          padding: "10px 16px",
-          background: "#F2C31A",
-          borderRadius: 10,
-          color: "#1F3864",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          marginTop: "var(--space-5)",
+          padding: "14px 16px",
+          minHeight: 48,
+          background: "var(--color-accent)",
+          borderRadius: "var(--radius-md)",
+          color: "var(--color-accent-ink)",
           fontWeight: 700,
           textDecoration: "none",
         }}
       >
-        🕶️ 실루엣 퀴즈 하러가기
+        <GlassesIcon size={20} strokeWidth={2} />
+        실루엣 퀴즈 하러가기
       </Link>
+    </AppShell>
+  );
+}
+
+function StatBox({ label, value }) {
+  return (
+    <div
+      style={{
+        background: "var(--color-surface-2)",
+        borderRadius: "var(--radius-md)",
+        padding: "var(--space-3) var(--space-4)",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{label}</div>
+      <div style={{ fontWeight: 700, fontSize: 17, marginTop: 2 }}>{value}</div>
+    </div>
+  );
+}
+
+function Section({ label, children }) {
+  return (
+    <div style={{ marginTop: "var(--space-4)" }}>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: "var(--color-text-muted)",
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      {children}
     </div>
   );
 }
