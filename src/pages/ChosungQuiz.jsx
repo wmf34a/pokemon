@@ -10,6 +10,7 @@ import {
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
+import { useAwardPoints } from "../hooks/useMyPokemonPoints";
 
 const HINT_STEPS = ["type", "description", "generation"];
 const GENERATION_LABEL_KO = {
@@ -35,6 +36,7 @@ export default function ChosungQuiz() {
   const [round, setRound] = useState(0);
   const [mode, setMode] = useState("choice"); // "choice" | "typed"
   const [typedGuess, setTypedGuess] = useState("");
+  const awardPoints = useAwardPoints();
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -72,7 +74,9 @@ export default function ChosungQuiz() {
     setCorrect(isCorrect);
     setRevealed(true);
     if (isCorrect) {
-      setScore((s) => s + Math.max(30 - hintLevel * 10, 10));
+      const earned = Math.max(30 - hintLevel * 10, 10);
+      setScore((s) => s + earned);
+      awardPoints(earned);
     }
   }
 
@@ -83,7 +87,9 @@ export default function ChosungQuiz() {
     setCorrect(isCorrect);
     setRevealed(true);
     if (isCorrect) {
-      setScore((s) => s + Math.max(30 - hintLevel * 10, 10));
+      const earned = Math.max(30 - hintLevel * 10, 10);
+      setScore((s) => s + earned);
+      awardPoints(earned);
     }
   }
 
