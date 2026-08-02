@@ -6,6 +6,8 @@ import QuizHub from "./pages/QuizHub";
 import SilhouetteQuiz from "./pages/SilhouetteQuiz";
 import ChosungQuiz from "./pages/ChosungQuiz";
 import CryQuiz from "./pages/CryQuiz";
+import ChooseStarter from "./pages/ChooseStarter";
+import MyPokemon from "./pages/MyPokemon";
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
       <Route path="/quiz/silhouette" element={<SilhouetteQuiz />} />
       <Route path="/quiz/chosung" element={<ChosungQuiz />} />
       <Route path="/quiz/cry" element={<CryQuiz />} />
+      <Route path="/mine/choose" element={<ChooseStarter />} />
+      <Route path="/mine" element={<MyPokemon />} />
     </Routes>
   );
 }
