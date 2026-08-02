@@ -59,7 +59,7 @@ export default function MyPokemon() {
           lineHeight: 1.6,
         }}
       >
-        퀴즈를 풀면 다음 진화까지 포인트가 쌓여요. (진화 시스템은 곧 추가돼요)
+        퀴즈를 풀면서 함께 키워보세요!
       </p>
     </AppShell>
   );
