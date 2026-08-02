@@ -20,11 +20,19 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { extractEvolutionInfo } from "./evolutionChain.mjs";
 
 const POKEAPI = "https://pokeapi.co/api/v2";
 const TOTAL_DEFAULT = 1025; // 2026년 기준 대략치 — 필요 시 조정
 const LIMIT = Number(process.argv[2]) || TOTAL_DEFAULT;
 const CONCURRENCY = 8; // PokeAPI에 과도한 동시 요청을 보내지 않기 위한 제한
+
+// 같은 진화 계열의 모든 species는 동일한 evolution-chain URL을 공유한다
+// (예: 이상해씨/이상해풀/이상해꽃 모두 evolution-chain/1/). ~1025개 species에 비해
+// 체인 수는 훨씬 적으므로, URL당 한 번만 fetch하도록 캐싱한다.
+// 값이 아니라 "Promise"를 캐싱해야, 여러 worker가 같은 URL을 동시에 요청할 때
+// 중복 fetch가 발생하지 않는다.
+const chainCache = new Map();
 
 async function fetchJson(url) {
   const res = await fetch(url);
@@ -50,11 +58,35 @@ function pickEnFlavorText(entries) {
   return en ? en.flavor_text.replace(/\n|\f/g, " ") : "No description available.";
 }
 
+// evolution-chain URL을 캐시에서 가져오거나, 없으면 fetch 후 캐시에 저장한다.
+// 개별 chain fetch가 실패해도 throw하지 않고 null을 반환해 빌드 전체를 막지 않는다.
+function fetchChain(url) {
+  if (!url) return Promise.resolve(null);
+  if (!chainCache.has(url)) {
+    chainCache.set(
+      url,
+      fetchJson(url)
+        .then((data) => data.chain)
+        .catch((err) => {
+          console.warn(`  evolution chain fetch failed for ${url}: ${err.message}`);
+          return null;
+        })
+    );
+  }
+  return chainCache.get(url);
+}
+
 async function fetchOne(id) {
   const [pokemon, species] = await Promise.all([
     fetchJson(`${POKEAPI}/pokemon/${id}`),
     fetchJson(`${POKEAPI}/pokemon-species/${id}`),
   ]);
+
+  const evolutionChainUrl = species.evolution_chain?.url || null;
+  const chainRoot = await fetchChain(evolutionChainUrl);
+  const evoInfo = chainRoot
+    ? extractEvolutionInfo(chainRoot, species.name)
+    : { evolutionStage: 1, evolvesFrom: null, evolvesTo: [] };
 
   return {
     id: pokemon.id,
@@ -77,7 +109,10 @@ async function fetchOne(id) {
       pokemon.sprites?.front_default ||
       null,
     cry: pokemon.cries?.latest || pokemon.cries?.legacy || null,
-    evolutionChainUrl: species.evolution_chain?.url || null,
+    evolutionChainUrl,
+    evolutionStage: evoInfo.evolutionStage,
+    evolvesFrom: evoInfo.evolvesFrom,
+    evolvesTo: evoInfo.evolvesTo,
   };
 }
 
