@@ -1,8 +1,25 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AppShell from "../components/AppShell";
-import { BookIcon, GamepadIcon } from "../components/Icons";
+import { SparklesIcon } from "../components/Icons";
+import { loadPokemonData } from "../utils/pokemonData";
+import { getMyPokemon } from "../utils/myPokemon";
 
 export default function Home() {
+  const [mine, setMine] = useState(undefined); // undefined = 확인 전, null = 없음, 객체 = 있음
+  const [artwork, setArtwork] = useState(null);
+
+  useEffect(() => {
+    const rec = getMyPokemon();
+    setMine(rec);
+    if (rec) {
+      loadPokemonData().then((all) => {
+        const p = all.find((x) => x.id === rec.currentStageId);
+        setArtwork(p?.artwork || null);
+      });
+    }
+  }, []);
+
   return (
     <AppShell title={undefined}>
       <div style={{ padding: "var(--space-4) 0 var(--space-2)" }}>
@@ -20,79 +37,98 @@ export default function Home() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gap: "var(--space-4)", marginTop: "var(--space-4)" }}>
-        <NavCard
-          to="/dex"
-          icon={BookIcon}
-          title="포켓몬 도감"
-          desc="전체 목록 · 가나다순 · 검색"
-          tint="var(--color-accent)"
-          ink="var(--color-accent-ink)"
-        />
-        <NavCard
-          to="/quiz"
-          icon={GamepadIcon}
-          title="퀴즈 바로가기"
-          desc="실루엣 · 울음소리 · 초성 퀴즈"
-          tint="var(--color-primary)"
-          ink="var(--color-text-on-primary)"
-        />
+      <div style={{ marginTop: "var(--space-4)" }}>
+        {mine === undefined && (
+          <div className="skeleton" style={{ height: 120, borderRadius: "var(--radius-lg)" }} />
+        )}
+
+        {mine === null && (
+          <Link
+            to="/mine/choose"
+            className="press pop-card"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-4)",
+              padding: "var(--space-5)",
+              borderRadius: "var(--radius-lg)",
+              background: "var(--color-primary)",
+              color: "var(--color-text-on-primary)",
+              textDecoration: "none",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 52,
+                height: 52,
+                borderRadius: "50%",
+                background: "color-mix(in srgb, currentColor 18%, transparent)",
+                flexShrink: 0,
+              }}
+            >
+              <SparklesIcon size={26} strokeWidth={1.9} />
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-heading)", fontSize: 19 }}>
+                나만의 포켓몬을 만나보세요!
+              </div>
+              <div style={{ fontWeight: 400, fontSize: 13, marginTop: 4, opacity: 0.85 }}>
+                포켓몬을 골라 퀴즈를 풀며 키워보세요
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {mine && (
+          <Link
+            to="/mine"
+            className="press pop-card"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-4)",
+              padding: "var(--space-4)",
+              borderRadius: "var(--radius-lg)",
+              background: "var(--color-surface)",
+              boxShadow: "var(--shadow-card)",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                background: "var(--color-surface-2)",
+                flexShrink: 0,
+              }}
+            >
+              {artwork && (
+                <img src={artwork} alt={mine.nickname} style={{ width: 52, height: 52 }} />
+              )}
+            </div>
+            <div>
+              <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>내 포켓몬</div>
+              <div style={{ fontFamily: "var(--font-heading)", fontSize: 19 }}>
+                {mine.nickname}
+              </div>
+            </div>
+          </Link>
+        )}
       </div>
 
-      <p
-        style={{
-          marginTop: "var(--space-10)",
-          fontSize: 12,
-          color: "var(--color-text-muted)",
-          lineHeight: 1.6,
-        }}
-      >
+      <p style={{ marginTop: "var(--space-10)", fontSize: 12, color: "var(--color-text-muted)", lineHeight: 1.6 }}>
         본 앱은 팬이 제작한 비공식 프로젝트이며 Nintendo, Game Freak, The
         Pokémon Company와 관련이 없습니다. 데이터 출처:{" "}
-        <a href="https://pokeapi.co" target="_blank" rel="noreferrer">
-          PokeAPI
-        </a>
+        <a href="https://pokeapi.co" target="_blank" rel="noreferrer">PokeAPI</a>
       </p>
     </AppShell>
-  );
-}
-
-function NavCard({ to, icon: Icon, title, desc, tint, ink }) {
-  return (
-    <Link
-      to={to}
-      className="press pop-card"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "var(--space-4)",
-        padding: "var(--space-5)",
-        borderRadius: "var(--radius-lg)",
-        background: tint,
-        color: ink,
-        textDecoration: "none",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 52,
-          height: 52,
-          borderRadius: "50%",
-          background: "color-mix(in srgb, currentColor 18%, transparent)",
-          flexShrink: 0,
-        }}
-      >
-        <Icon size={26} strokeWidth={1.9} />
-      </div>
-      <div>
-        <div style={{ fontFamily: "var(--font-heading)", fontSize: 19 }}>{title}</div>
-        <div style={{ fontWeight: 400, fontSize: 13, marginTop: 4, opacity: 0.85 }}>
-          {desc}
-        </div>
-      </div>
-    </Link>
   );
 }
