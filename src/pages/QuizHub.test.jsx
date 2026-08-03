@@ -16,6 +16,9 @@ describe("QuizHub", () => {
 
     const chosungLink = screen.getByRole("link", { name: /초성 퀴즈/ });
     expect(chosungLink).toHaveAttribute("href", "/quiz/chosung");
+
+    const evolutionLink = screen.getByRole("link", { name: /진화 순서 맞추기/ });
+    expect(evolutionLink).toHaveAttribute("href", "/quiz/evolution");
   });
 
   it("준비중인 모드는 '준비중' 표시를 보여준다", () => {
