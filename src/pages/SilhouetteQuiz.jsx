@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import AudioButton from "../components/AudioButton";
 import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
@@ -7,6 +8,7 @@ import {
   pickRandom,
   TYPE_LABEL_KO,
   applyGen1OnlyFilter,
+  SESSION_LENGTH,
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
@@ -22,13 +24,16 @@ const COLOR_LABEL_KO = {
 
 export default function SilhouetteQuiz() {
   const [all, setAll] = useState([]);
+  const [sessionQuestions, setSessionQuestions] = useState([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [sessionComplete, setSessionComplete] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
   const [answer, setAnswer] = useState(null);
   const [choices, setChoices] = useState([]);
   const [hintLevel, setHintLevel] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [correct, setCorrect] = useState(null);
   const [score, setScore] = useState(0);
-  const [round, setRound] = useState(0);
   const [mode, setMode] = useState("choice"); // "choice" | "typed"
   const [typedGuess, setTypedGuess] = useState("");
   const awardPoints = useAwardPoints();
@@ -40,23 +45,81 @@ export default function SilhouetteQuiz() {
     });
   }, []);
 
-  const nextRound = useCallback(() => {
+  const startSession = useCallback(() => {
     if (all.length < 4) return;
-    const [correctPick, ...distractors] = pickRandom(all, 4);
-    setAnswer(correctPick);
-    setChoices(shuffle([correctPick, ...distractors]));
-    setHintLevel(0);
-    setRevealed(false);
-    setCorrect(null);
-    setEvolutionResult(null);
-    setTypedGuess("");
-    setRound((r) => r + 1);
+    setSessionQuestions(pickRandom(all, SESSION_LENGTH));
+    setQuestionIndex(0);
+    setSessionComplete(false);
+    setCorrectCount(0);
+    setScore(0);
   }, [all]);
 
   useEffect(() => {
-    if (all.length) nextRound();
+    if (all.length) startSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all]);
+
+  const setupQuestion = useCallback(
+    (index, questions) => {
+      const correctPick = questions[index];
+      const distractors = pickRandom(
+        all.filter((p) => p.id !== correctPick.id),
+        3
+      );
+      setAnswer(correctPick);
+      setChoices(shuffle([correctPick, ...distractors]));
+      setHintLevel(0);
+      setRevealed(false);
+      setCorrect(null);
+      setEvolutionResult(null);
+      setTypedGuess("");
+    },
+    [all]
+  );
+
+  useEffect(() => {
+    if (sessionQuestions.length) setupQuestion(0, sessionQuestions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionQuestions]);
+
+  function goToNext() {
+    const next = questionIndex + 1;
+    if (next >= sessionQuestions.length) {
+      setSessionComplete(true);
+      return;
+    }
+    setQuestionIndex(next);
+    setupQuestion(next, sessionQuestions);
+  }
+
+  if (sessionComplete) {
+    return (
+      <AppShell title="실루엣 퀴즈" backTo="/quiz">
+        <div style={{ textAlign: "center", marginTop: "var(--space-6)" }}>
+          <h2>세션 완료!</h2>
+          <p style={{ marginTop: 8, fontSize: 15 }}>
+            {sessionQuestions.length}문제 중 <b>{correctCount}문제</b> 정답 · 총{" "}
+            <b>{score}점</b>
+          </p>
+          <button onClick={startSession} style={primaryBtn}>
+            다시 하기
+          </button>
+          <div style={{ marginTop: 8 }}>
+            <Link
+              to="/quiz"
+              style={{
+                color: "var(--color-text-muted)",
+                fontSize: 13,
+                textDecoration: "underline",
+              }}
+            >
+              퀴즈 목록으로
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   if (!answer) {
     return (
@@ -73,6 +136,7 @@ export default function SilhouetteQuiz() {
     if (isCorrect) {
       const earned = Math.max(30 - hintLevel * 10, 10);
       setScore((s) => s + earned);
+      setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
     }
   }
@@ -86,6 +150,7 @@ export default function SilhouetteQuiz() {
     if (isCorrect) {
       const earned = Math.max(30 - hintLevel * 10, 10);
       setScore((s) => s + earned);
+      setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
     }
   }
@@ -98,7 +163,7 @@ export default function SilhouetteQuiz() {
     <AppShell title="실루엣 퀴즈" backTo="/quiz">
       <div style={{ textAlign: "center" }}>
         <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
-          {round}번째 문제 · 점수 {score}점
+          {questionIndex + 1}/{sessionQuestions.length}번째 문제 · 점수 {score}점
         </p>
 
         <div
@@ -201,7 +266,7 @@ export default function SilhouetteQuiz() {
             <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 8 }}>
               {answer.descriptionKo || answer.descriptionEn}
             </p>
-            <button onClick={nextRound} style={primaryBtn}>
+            <button onClick={goToNext} style={primaryBtn}>
               다음 문제 →
             </button>
           </div>

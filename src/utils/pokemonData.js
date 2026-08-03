@@ -14,6 +14,11 @@ export async function loadPokemonData() {
   return cache;
 }
 
+// 퀴즈 한 세션에서 출제할 문제 수. 다 풀면 결과 요약 화면으로 전환되고,
+// "다시 하기"나 재진입 시 매번 새로 순수 랜덤으로 20문제를 뽑는다(직전
+// 세션과의 중복 회피는 하지 않음).
+export const SESSION_LENGTH = 20;
+
 export const SORT_OPTIONS = {
   NAME_KO: "이름(가나다순)",
   ID: "도감번호순",
