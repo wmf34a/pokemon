@@ -11,6 +11,7 @@ import {
 import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
+import EvolutionToast from "../components/EvolutionToast";
 
 const HINT_STEPS = ["type", "color", "chosung"];
 const COLOR_LABEL_KO = {
@@ -31,6 +32,7 @@ export default function SilhouetteQuiz() {
   const [mode, setMode] = useState("choice"); // "choice" | "typed"
   const [typedGuess, setTypedGuess] = useState("");
   const awardPoints = useAwardPoints();
+  const [evolutionResult, setEvolutionResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -46,6 +48,7 @@ export default function SilhouetteQuiz() {
     setHintLevel(0);
     setRevealed(false);
     setCorrect(null);
+    setEvolutionResult(null);
     setTypedGuess("");
     setRound((r) => r + 1);
   }, [all]);
@@ -63,18 +66,18 @@ export default function SilhouetteQuiz() {
     );
   }
 
-  function submitChoice(p) {
+  async function submitChoice(p) {
     const isCorrect = p.id === answer.id;
     setCorrect(isCorrect);
     setRevealed(true);
     if (isCorrect) {
       const earned = Math.max(30 - hintLevel * 10, 10);
       setScore((s) => s + earned);
-      awardPoints(earned);
+      setEvolutionResult(await awardPoints(earned));
     }
   }
 
-  function submitTyped() {
+  async function submitTyped() {
     const guess = typedGuess.trim();
     const isCorrect =
       guess === answer.nameKo || guess.toLowerCase() === answer.nameEn;
@@ -83,7 +86,7 @@ export default function SilhouetteQuiz() {
     if (isCorrect) {
       const earned = Math.max(30 - hintLevel * 10, 10);
       setScore((s) => s + earned);
-      awardPoints(earned);
+      setEvolutionResult(await awardPoints(earned));
     }
   }
 
@@ -186,6 +189,7 @@ export default function SilhouetteQuiz() {
         {revealed && (
           <div style={{ marginTop: 16 }}>
             <ResultHeading correct={correct} />
+            <EvolutionToast result={evolutionResult} />
             <p>
               정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
             </p>
