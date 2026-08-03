@@ -20,9 +20,15 @@ export default function EvolutionToast({ result }) {
 
   if (!shouldShow) return null;
 
+  const sprite = result.newStagePokemon?.artwork;
+
   return (
     <div className="evolution-reveal-new" style={evolutionToast}>
-      <SparklesIcon size={20} />
+      {sprite ? (
+        <img src={sprite} alt={result.newStagePokemon.nameKo} style={{ width: 28, height: 28, objectFit: "contain" }} />
+      ) : (
+        <SparklesIcon size={20} />
+      )}
       <span>{getMessage(result)}</span>
     </div>
   );
