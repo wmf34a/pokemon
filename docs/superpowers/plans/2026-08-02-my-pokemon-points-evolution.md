@@ -62,7 +62,7 @@
 - `chooseStarter()` must not blindly reset `lifetimePoints`/`collection` to `0`/`[]` anymore (that would violate the spec's persistence requirement across "새 친구 고르기"). It now reads whatever raw JSON is currently stored (even if it fails `getMyPokemon()`'s validity check, e.g. right after graduation) via a new internal `readRawRecord()` and carries those two fields forward, defaulting to `0`/`[]` only when nothing valid is present (true first-time use).
 - **`resetMyPokemon()` vs. `graduateAndRestart()` (new requirement, added mid-plan):** the user asked for a "다시 선택" (re-choose) escape hatch available at any time, not only after reaching the final evolution. This is deliberately a *separate* function from `graduateAndRestart()`, not a relaxed precondition on the same one — `collection` is documented (spec + this plan's own comments) as "완전 진화 후 졸업시킨" pokemon, a badge-of-honor gallery of *completed* raises. Letting an unfinished pokemon slip into that same list via a generic reset would quietly dilute that meaning. `resetMyPokemon()` therefore clears the current selection back to the "no pokemon chosen" state (identical field reset to `graduateAndRestart`: `starterId`/`nickname`/`currentStageId`/`history`/`pointsSinceLastEvolution`/`pendingEvolution`/`pendingBranchChoices` all cleared) while preserving `lifetimePoints` (points earned reflect quiz skill, not which pokemon was being raised) — but it does **not** push the abandoned `currentStageId` onto `collection`. Both functions end in the same "getMyPokemon() → null" state and both existing callers (`MyPokemon.jsx`'s graduation flow, and the new always-available "다른 포켓몬 고르기" control) reuse it identically going forward.
 
-- [ ] **Step 1: Update the test file with new fixtures and failing tests**
+- [x] **Step 1: Update the test file with new fixtures and failing tests**
 
 Replace the full contents of `src/utils/myPokemon.test.js`:
 
@@ -376,12 +376,12 @@ describe("resetMyPokemon", () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify the new ones fail**
+- [x] **Step 2: Run tests to verify the new ones fail**
 
 Run: `npx vitest run src/utils/myPokemon.test.js`
 Expected: FAIL — `addPoints`/`resolveBranchEvolution`/`clearPendingEvolution`/`graduateAndRestart`/`EVOLUTION_THRESHOLD` are not exported yet; the updated `toEqual` in the first `getMyPokemon` test also fails (missing `pendingBranchChoices`).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Replace the full contents of `src/utils/myPokemon.js`:
 
@@ -654,12 +654,12 @@ export function resetMyPokemon() {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/utils/myPokemon.test.js`
 Expected: PASS (27 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/myPokemon.js src/utils/myPokemon.test.js
@@ -679,7 +679,7 @@ git commit -m "feat: add point accrual, evolution triggering, and graduation to 
 
 **Design decision:** the hook takes **no arguments** and calls `loadPokemonData()` itself (already cached after the page's own `loadPokemonData()` call, so this is not an extra network request) rather than being passed the quiz page's own `all` state array. This is a deliberate deviation worth double-checking: three of the four quiz pages call `applyGen1OnlyFilter(...)` before storing into `all`, so if the player's `currentStageId` happens to fall outside the current 1세대-only filter (e.g. they toggled the filter on after picking a non-gen1 starter), looking it up in the page's filtered array would silently fail to find it and skip the point award. Looking it up in the *unfiltered* full dataset instead avoids that bug entirely.
 
-- [ ] **Step 1: Write the implementation** (no dedicated test file — see Self-Review; this is a thin wrapper whose real logic already has full coverage in `myPokemon.test.js`, matching this codebase's existing convention of not testing fetch-dependent pages/hooks)
+- [x] **Step 1: Write the implementation** (no dedicated test file — see Self-Review; this is a thin wrapper whose real logic already has full coverage in `myPokemon.test.js`, matching this codebase's existing convention of not testing fetch-dependent pages/hooks)
 
 Create `src/hooks/useMyPokemonPoints.js`:
 
@@ -711,7 +711,7 @@ export function useAwardPoints() {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add src/hooks/useMyPokemonPoints.js
@@ -732,7 +732,7 @@ git commit -m "feat: add useAwardPoints hook wrapping addPoints for quiz pages"
 
 Same one-line-plus-one-call change in all three files: import the hook, call it once per component, and invoke it right where `setScore` already fires on a correct answer, with the exact same `Math.max(30 - hintLevel * 10, 10)` expression already used for the score.
 
-- [ ] **Step 1: `src/pages/SilhouetteQuiz.jsx`** — add the import and hook call, and award points in both `submitChoice` and `submitTyped`:
+- [x] **Step 1: `src/pages/SilhouetteQuiz.jsx`** — add the import and hook call, and award points in both `submitChoice` and `submitTyped`:
 
 ```jsx
 import { useEffect, useState, useCallback } from "react";
@@ -976,7 +976,7 @@ function shuffle(arr) {
 }
 ```
 
-- [ ] **Step 2: `src/pages/ChosungQuiz.jsx`** — identical treatment. Replace the full file, keeping everything the same except: add `import { useAwardPoints } from "../hooks/useMyPokemonPoints";`, add `const awardPoints = useAwardPoints();` next to the other `useState` calls, and change `submitChoice`/`submitTyped` to:
+- [x] **Step 2: `src/pages/ChosungQuiz.jsx`** — identical treatment. Replace the full file, keeping everything the same except: add `import { useAwardPoints } from "../hooks/useMyPokemonPoints";`, add `const awardPoints = useAwardPoints();` next to the other `useState` calls, and change `submitChoice`/`submitTyped` to:
 
 ```jsx
   function submitChoice(p) {
@@ -1006,14 +1006,14 @@ function shuffle(arr) {
 
 (Every other line of `src/pages/ChosungQuiz.jsx` — the chosung display block, the generation hint step, the rest of the JSX — is unchanged from the current file. Apply this as a full-file replacement using the current file's content with only the import line and these two functions modified, to avoid any accidental drift.)
 
-- [ ] **Step 3: `src/pages/CryQuiz.jsx`** — identical treatment: add the same import, `const awardPoints = useAwardPoints();`, and the same two-line change (`const earned = ...; setScore(...); awardPoints(earned);`) inside both `submitChoice` and `submitTyped`. All other lines (audio ref, `playCry`, hint steps) are unchanged.
+- [x] **Step 3: `src/pages/CryQuiz.jsx`** — identical treatment: add the same import, `const awardPoints = useAwardPoints();`, and the same two-line change (`const earned = ...; setScore(...); awardPoints(earned);`) inside both `submitChoice` and `submitTyped`. All other lines (audio ref, `playCry`, hint steps) are unchanged.
 
-- [ ] **Step 4: Run the full test suite to confirm no regressions**
+- [x] **Step 4: Run the full test suite to confirm no regressions**
 
 Run: `npm test`
 Expected: PASS — no existing test targets these three pages directly (consistent with the existing no-page-test convention), so nothing should break.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/pages/SilhouetteQuiz.jsx src/pages/ChosungQuiz.jsx src/pages/CryQuiz.jsx
@@ -1030,7 +1030,7 @@ git commit -m "feat: award my-Pokemon points on correct quiz answers"
 **Interfaces:**
 - Produces: `.evolution-reveal-new`, `.evolution-shimmer-ring` classes, consumed by Task 5 (`Home.jsx`).
 
-- [ ] **Step 1: Append to the end of `src/index.css`** (after the existing `@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }` block):
+- [x] **Step 1: Append to the end of `src/index.css`** (after the existing `@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }` block):
 
 ```css
 @keyframes evolution-pop {
@@ -1070,7 +1070,7 @@ git commit -m "feat: award my-Pokemon points on correct quiz answers"
 
 (Deliberately structured as a single `@media (prefers-reduced-motion: no-preference)` block wrapping both animations — same gating direction as the existing `.press` rule at `src/index.css:172-179`, rather than the "animation, then reduce: none" order used for `.skeleton`. Either order is equivalent; this mirrors `.press`'s pattern since both are "opt-in only when motion is fine" cases.)
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add src/index.css
@@ -1094,7 +1094,7 @@ git commit -m "style: add reduced-motion-gated evolution reveal animations"
 - The reveal UI shows the pre-evolution and post-evolution artwork side-by-side (dimmed "before" → glowing/pop-animated "after") rather than a timed cross-fade sequence. This avoids needing any JS-driven timers to gate a "wait N ms, then reveal" sequence under `prefers-reduced-motion` — the CSS media query alone (Task 4) fully handles the reduced-motion case since there's no timing to skip, just entrance animations to disable.
 - Adds the progress bar (`pointsSinceLastEvolution / EVOLUTION_THRESHOLD`) to the normal-state status card. This wasn't spelled out as its own bullet in the task brief's five numbered scope items, but the underlying spec (`docs/superpowers/specs/2026-08-02-my-pokemon-evolution-design.md` line 119) explicitly requires it for Home's "있으면" state, and the foundation plan explicitly deferred it "since point accrual doesn't exist in this slice" (`docs/superpowers/plans/2026-08-02-my-pokemon-foundation.md` line 959) — now that Task 1 adds point accrual, this is squarely in scope. Flagged for human confirmation in Self-Review.
 
-- [ ] **Step 1: Replace the full contents of `src/pages/Home.jsx`**
+- [x] **Step 1: Replace the full contents of `src/pages/Home.jsx`**
 
 ```jsx
 import { useEffect, useMemo, useState } from "react";
@@ -1435,7 +1435,7 @@ export default function Home() {
 }
 ```
 
-- [ ] **Step 2: Manual verification**
+- [x] **Step 2: Manual verification**
 
 Run: `npm run dev`. Simulate a pending evolution by setting `localStorage` in the browser console before loading `/`, e.g.:
 ```js
@@ -1447,12 +1447,12 @@ localStorage.setItem("pokemonMine.v1", JSON.stringify({
 ```
 Reload `/` — confirm the reveal screen shows 이상해씨→이상해풀 with the shimmer/pop animation, and "계속하기" returns to the normal card with `pendingEvolution` cleared (verify via `localStorage.getItem("pokemonMine.v1")`). Repeat with `currentStageId: 133` (이브이) and `pendingBranchChoices` set to eevee's branches to confirm the picker renders and tapping a branch transitions into the reveal step. Confirm the normal-state progress bar renders correctly proportional to `pointsSinceLastEvolution`.
 
-- [ ] **Step 3: Run the full test suite**
+- [x] **Step 3: Run the full test suite**
 
 Run: `npm test`
 Expected: PASS (no existing test targets `Home.jsx`, consistent with the existing convention).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/pages/Home.jsx
@@ -1471,7 +1471,7 @@ git commit -m "feat: play evolution celebration (branch picker + reveal) and pro
 
 **New requirement folded in mid-plan:** the user asked for a way to change their mind and pick a different pokemon at any time, not only after reaching the final evolution. This is a *second*, always-visible control distinct from the graduation panel: a small "다른 포켓몬 고르기" text link near the bottom of the screen, visible regardless of `isFinalEvolution`. Because it discards in-progress evolution progress toward the next stage (unlike the graduation flow, which only ever fires once a pokemon is already fully done), it goes through a lightweight in-app confirmation step first — no native `confirm()` dialog (inconsistent styling, and this codebase never uses one), just a small inline panel with "정말요?" copy and an explicit Cancel, matching the same visual language as the graduation panel already in this file. Calls `resetMyPokemon()` (not `graduateAndRestart()` — see Task 1's design-decision note on why these stay separate) then navigates to `/mine/choose`.
 
-- [ ] **Step 1: Replace the full contents of `src/pages/MyPokemon.jsx`**
+- [x] **Step 1: Replace the full contents of `src/pages/MyPokemon.jsx`**
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -1681,11 +1681,11 @@ export default function MyPokemon() {
 }
 ```
 
-- [ ] **Step 2: Manual verification**
+- [x] **Step 2: Manual verification**
 
 Run: `npm run dev`. Set `localStorage` to a final-evolution record (e.g. `currentStageId: 3` / 이상해꽃) and reload `/mine`. Confirm the graduation panel appears with both buttons; "계속 보기" hides the panel without touching localStorage; "새 친구 고르기" navigates to `/mine/choose` and `localStorage.getItem("pokemonMine.v1")` shows `currentStageId: null` with `collection` containing `3` and `lifetimePoints` unchanged. Separately, with a non-final record (e.g. 이상해씨), confirm "다른 포켓몬 고르기" always shows regardless of evolution stage; tapping it reveals the confirm panel; "취소" dismisses it with no storage change; "새로 고르기" navigates to `/mine/choose` and `pokemonMine.v1`'s `collection` does **not** contain the abandoned pokemon's id (unlike the graduation path), while `lifetimePoints` is unchanged.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/pages/MyPokemon.jsx
@@ -1705,7 +1705,7 @@ git commit -m "feat: add final-evolution graduation flow and always-available re
 
 **Judgment call locked in here (flagged for human double-check):** branching chains (Eevee: `evolvesTo.length > 1`) are handled by deterministically walking `evolvesTo[0]` at every step, rather than excluding branching Pokémon from the quiz pool entirely. This keeps popular branch-family Pokémon (Eevee) eligible while still guaranteeing exactly one "correct order" per question (the same edge is always walked). The alternative — restricting candidates to chains with no branching node anywhere in the path — was considered and rejected because it would silently exclude Eevee from ever appearing in this quiz mode.
 
-- [ ] **Step 1: Write the failing test file**
+- [x] **Step 1: Write the failing test file**
 
 Create `src/utils/evolutionQuizChain.test.js`:
 
@@ -1787,12 +1787,12 @@ describe("pickEvolutionQuizChain", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/utils/evolutionQuizChain.test.js`
 Expected: FAIL — `Cannot find module './evolutionQuizChain'`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `src/utils/evolutionQuizChain.js`:
 
@@ -1844,12 +1844,12 @@ export function pickEvolutionQuizChain(allPokemon) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/utils/evolutionQuizChain.test.js`
 Expected: PASS (10 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/evolutionQuizChain.js src/utils/evolutionQuizChain.test.js
@@ -1873,7 +1873,7 @@ git commit -m "test: add pure evolution-order-quiz chain-picking logic with unit
 - Hints target the chain's first-stage Pokémon (`chain[0]`), mirroring how the other three quizzes hint about their single `answer` — 2 steps (type, then description) per spec, not the 3-step pattern the other quizzes use.
 - `nextRound` retries `pickEvolutionQuizChain` up to 20 times if it returns `null` (e.g. transient gen1-only-filter edge case where a chain's next stage falls outside the filtered set) before giving up for that effect run.
 
-- [ ] **Step 1: Write the implementation**
+- [x] **Step 1: Write the implementation**
 
 Create `src/pages/EvolutionQuiz.jsx`:
 
@@ -2120,11 +2120,11 @@ function shuffle(arr) {
 }
 ```
 
-- [ ] **Step 2: Manual verification (after Task 9 wires the route)**
+- [x] **Step 2: Manual verification (after Task 9 wires the route)**
 
 Run: `npm run dev`, navigate to `/quiz/evolution`. Confirm cards render unlabeled artwork, tapping accumulates ①②③ badges, tapping the last card auto-grades, hint buttons reveal type then description of the chain's first stage, and a correct answer both increments the on-screen score and (with a chosen starter set in localStorage) increments `pointsSinceLastEvolution` in `pokemonMine.v1`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/pages/EvolutionQuiz.jsx
@@ -2143,7 +2143,7 @@ git commit -m "feat: add tap-to-order evolution-sequence quiz mode"
 **Interfaces:**
 - Consumes: `EvolutionQuiz` (Task 8) default export.
 
-- [ ] **Step 1: Flip `ready: false` to `ready: true` for the `evolution` entry in `src/pages/QuizHub.jsx`'s `MODES` array**
+- [x] **Step 1: Flip `ready: false` to `ready: true` for the `evolution` entry in `src/pages/QuizHub.jsx`'s `MODES` array**
 
 In `src/pages/QuizHub.jsx`, change:
 ```js
@@ -2155,7 +2155,7 @@ to:
 ```
 (No other line in the file changes.)
 
-- [ ] **Step 2: Add a render-test assertion in `src/pages/QuizHub.test.jsx`**
+- [x] **Step 2: Add a render-test assertion in `src/pages/QuizHub.test.jsx`**
 
 Replace the full contents of `src/pages/QuizHub.test.jsx`:
 
@@ -2195,7 +2195,7 @@ describe("QuizHub", () => {
 });
 ```
 
-- [ ] **Step 3: Add the `/quiz/evolution` route to `src/App.jsx`**
+- [x] **Step 3: Add the `/quiz/evolution` route to `src/App.jsx`**
 
 Replace the full contents of `src/App.jsx`:
 
@@ -2230,16 +2230,16 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 4: Run the full test suite**
+- [x] **Step 4: Run the full test suite**
 
 Run: `npm test`
 Expected: PASS — all tests green, including the new `evolutionLink` assertion in `QuizHub.test.jsx`, all of `myPokemon.test.js` (Task 1), and `evolutionQuizChain.test.js` (Task 7).
 
-- [ ] **Step 5: Manual end-to-end verification**
+- [x] **Step 5: Manual end-to-end verification**
 
 Run: `npm run dev`. From `/quiz`, confirm "진화 순서 맞추기" is no longer greyed out/labelled "준비중" and navigates to `/quiz/evolution`. Play through a full loop: choose a starter at `/mine/choose`, answer enough quiz questions across all four modes to cross 200 points, confirm no celebration appears mid-quiz, then visit `/` and confirm the evolution reveal (or branch picker, if the starter's family branches) plays exactly once.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/pages/QuizHub.jsx src/pages/QuizHub.test.jsx src/App.jsx

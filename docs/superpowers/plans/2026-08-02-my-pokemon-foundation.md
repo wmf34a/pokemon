@@ -48,7 +48,7 @@
 - Produces: `idFromUrl(url: string|null): number|null`, `findChainNode(root, speciesName, depth=1, parentId=null): {node, depth, parentId}|null`, `extractEvolutionInfo(chainRoot, speciesName): {evolutionStage: number, evolvesFrom: number|null, evolvesTo: Array<{id:number, minLevel:number|null}>}`.
 - Consumed by: Task 2 (`scripts/fetch-pokemon-data.mjs`).
 
-- [ ] **Step 1: Write the failing test file**
+- [x] **Step 1: Write the failing test file**
 
 Create `scripts/fetch-pokemon-data.test.mjs`:
 
@@ -171,12 +171,12 @@ describe("extractEvolutionInfo", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run scripts/fetch-pokemon-data.test.mjs`
 Expected: FAIL — `Cannot find module './evolutionChain.mjs'` (or similar resolve error), since the module doesn't exist yet.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `scripts/evolutionChain.mjs`:
 
@@ -241,12 +241,12 @@ export function extractEvolutionInfo(chainRoot, speciesName) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run scripts/fetch-pokemon-data.test.mjs`
 Expected: PASS (13 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/evolutionChain.mjs scripts/fetch-pokemon-data.test.mjs
@@ -266,7 +266,7 @@ git commit -m "test: add pure evolution-chain tree-walking helpers with unit tes
 
 This task has no automated test (network-dependent, and the sandbox may not have internet access) — verify with a syntax check plus a manual smoke run instructions below.
 
-- [ ] **Step 1: Replace the full contents of `scripts/fetch-pokemon-data.mjs`**
+- [x] **Step 1: Replace the full contents of `scripts/fetch-pokemon-data.mjs`**
 
 ```js
 /**
@@ -427,22 +427,22 @@ run().catch((err) => {
 });
 ```
 
-- [ ] **Step 2: Syntax-check the script (no network required)**
+- [x] **Step 2: Syntax-check the script (no network required)**
 
 Run: `node --check scripts/fetch-pokemon-data.mjs`
 Expected: no output, exit code 0 (valid syntax, `import` resolves at parse-check time since it's a relative path that exists).
 
-- [ ] **Step 3: Re-run the Task 1 unit tests to confirm nothing broke**
+- [x] **Step 3: Re-run the Task 1 unit tests to confirm nothing broke**
 
 Run: `npx vitest run scripts/fetch-pokemon-data.test.mjs`
 Expected: PASS (unaffected — the test only imports `evolutionChain.mjs`, never `fetch-pokemon-data.mjs`, so it never triggers `run()`).
 
-- [ ] **Step 4: Manual smoke test (requires network access — run locally, not expected to work in this sandbox)**
+- [x] **Step 4: Manual smoke test (requires network access — run locally, not expected to work in this sandbox)**
 
 Run: `node scripts/fetch-pokemon-data.mjs 20`
 Expected: `public/data/pokemon.json` is written with 20 entries; spot check that entry `id: 1` (bulbasaur) has `evolutionStage: 1, evolvesFrom: null, evolvesTo: [{id: 2, minLevel: 16}]` and entry `id: 4` (charmander, if within first 20) has similar linear-chain data. This step is a human checkpoint, not part of CI.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/fetch-pokemon-data.mjs
@@ -461,7 +461,7 @@ git commit -m "feat: fetch and cache evolution-chain data per species in the dat
 - Consumes: nothing beyond global `localStorage` (jsdom provides a working `localStorage` in tests, same as implicitly relied upon by `getGen1OnlyPref`'s pattern).
 - Produces: `getMyPokemon(): Record|null`, `chooseStarter(pokemon: {id:number, nameKo:string}, nickname: string): Record`, `getStarterCandidates(allPokemon: Array): Array`. The `Record` shape: `{starterId, nickname, currentStageId, history, pointsSinceLastEvolution, lifetimePoints, pendingEvolution, collection}`. Consumed by Task 4 (`ChooseStarter.jsx`), Task 5 (`MyPokemon.jsx`), Task 7 (`Home.jsx`).
 
-- [ ] **Step 1: Write the failing test file**
+- [x] **Step 1: Write the failing test file**
 
 Create `src/utils/myPokemon.test.js`:
 
@@ -552,12 +552,12 @@ describe("getStarterCandidates", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/utils/myPokemon.test.js`
 Expected: FAIL — `Cannot find module './myPokemon'` (module doesn't exist yet).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `src/utils/myPokemon.js`:
 
@@ -631,12 +631,12 @@ export function getStarterCandidates(allPokemon) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/utils/myPokemon.test.js`
 Expected: PASS (7 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/myPokemon.js src/utils/myPokemon.test.js
@@ -656,7 +656,7 @@ git commit -m "feat: add localStorage-backed my-Pokemon storage module"
 
 No automated test for this task — it's a data-fetching page that follows the same untested convention as `Dex.jsx`/`PokemonDetail.jsx` in this codebase (only pure-logic modules have unit tests here). Verify manually per Step 2 below.
 
-- [ ] **Step 1: Write the implementation**
+- [x] **Step 1: Write the implementation**
 
 Create `src/pages/ChooseStarter.jsx`:
 
@@ -934,11 +934,11 @@ function pillStyle(active) {
 }
 ```
 
-- [ ] **Step 2: Manual verification (after Task 6 wires the route)**
+- [x] **Step 2: Manual verification (after Task 6 wires the route)**
 
 Run: `npm run dev`, navigate to `http://localhost:5173/mine/choose` (assuming default Vite port). Confirm: only stage-1 evolvable Pokémon appear (e.g. 이상해씨 appears, 피죤투/뮤츠-type finals/legendaries do not), search and type-filter pills work, tapping a card shows the nickname-confirm panel, confirming navigates to `/mine` (which won't exist as a real screen until Task 5/6 — expect a blank/404-ish result until then, that's fine at this checkpoint).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/pages/ChooseStarter.jsx
@@ -958,7 +958,7 @@ git commit -m "feat: add starter-selection screen at /mine/choose"
 
 **Judgment call locked in here:** no progress bar, no history strip, no collection gallery (all deferred — point accrual doesn't exist yet in this slice). A single static Korean placeholder line is shown instead of a TODO comment (decided explicitly, see Self-Review section).
 
-- [ ] **Step 1: Write the implementation**
+- [x] **Step 1: Write the implementation**
 
 Create `src/pages/MyPokemon.jsx`:
 
@@ -1031,11 +1031,11 @@ export default function MyPokemon() {
 }
 ```
 
-- [ ] **Step 2: Manual verification (after Task 6 wires the route)**
+- [x] **Step 2: Manual verification (after Task 6 wires the route)**
 
 Run: `npm run dev`. With no `pokemonMine.v1` in localStorage, navigating to `/mine` should redirect to `/mine/choose`. After picking a starter there, navigating to `/mine` should show the artwork, nickname, id, and the static placeholder line.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/pages/MyPokemon.jsx
@@ -1052,7 +1052,7 @@ git commit -m "feat: add minimal my-Pokemon screen at /mine"
 **Interfaces:**
 - Consumes: `ChooseStarter` (Task 4), `MyPokemon` (Task 5) default exports.
 
-- [ ] **Step 1: Replace the full contents of `src/App.jsx`**
+- [x] **Step 1: Replace the full contents of `src/App.jsx`**
 
 ```jsx
 import { Routes, Route } from "react-router-dom";
@@ -1083,16 +1083,16 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 2: Manual verification**
+- [x] **Step 2: Manual verification**
 
 Run: `npm run dev` and manually confirm `/mine/choose` and `/mine` both render (per Task 4/5 Step 2 checks above), now end-to-end: pick a starter on `/mine/choose` → land on `/mine` showing the chosen Pokémon.
 
-- [ ] **Step 3: Run the full test suite to confirm no regressions**
+- [x] **Step 3: Run the full test suite to confirm no regressions**
 
 Run: `npm test`
 Expected: PASS — all existing tests (`QuizHub.test.jsx`, `hangul.test.js`, `pokemonData.test.js`) plus the two new test files from Task 1 and Task 3 pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/App.jsx
@@ -1109,7 +1109,7 @@ git commit -m "feat: route /mine/choose and /mine to the new my-Pokemon pages"
 **Interfaces:**
 - Consumes: `getMyPokemon()` (Task 3), `loadPokemonData()` (pre-existing), `SparklesIcon` (pre-existing, from `src/components/Icons.jsx`).
 
-- [ ] **Step 1: Replace the full contents of `src/pages/Home.jsx`**
+- [x] **Step 1: Replace the full contents of `src/pages/Home.jsx`**
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -1248,16 +1248,16 @@ export default function Home() {
 }
 ```
 
-- [ ] **Step 2: Manual verification**
+- [x] **Step 2: Manual verification**
 
 Run: `npm run dev`. With no `pokemonMine.v1` in localStorage, `/` shows the "나만의 포켓몬을 만나보세요!" CTA card linking to `/mine/choose`. After choosing a starter, revisiting `/` shows the compact status card with artwork + nickname linking to `/mine`. Confirm the bottom tab bar (홈/도감/퀴즈) still works for reaching `/dex` and `/quiz` (this replaces the removed `NavCard` shortcuts, per the spec's own reasoning that they duplicated the tab bar).
 
-- [ ] **Step 3: Run the full test suite one final time**
+- [x] **Step 3: Run the full test suite one final time**
 
 Run: `npm test`
 Expected: PASS — all tests green (no test targets `Home.jsx` directly, consistent with existing convention; `QuizHub.test.jsx` and the two new test files remain unaffected).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/pages/Home.jsx
