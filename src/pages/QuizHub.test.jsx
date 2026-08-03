@@ -19,6 +19,9 @@ describe("QuizHub", () => {
 
     const evolutionLink = screen.getByRole("link", { name: /진화 순서 맞추기/ });
     expect(evolutionLink).toHaveAttribute("href", "/quiz/evolution");
+
+    const zoomLink = screen.getByRole("link", { name: /누구냔 넌/ });
+    expect(zoomLink).toHaveAttribute("href", "/quiz/zoom");
   });
 
   it("준비중인 모드는 '준비중' 표시를 보여준다", () => {
