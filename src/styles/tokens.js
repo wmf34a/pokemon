@@ -70,3 +70,17 @@ export function pill(active) {
     marginRight: 6,
   };
 }
+
+export const evolutionToast = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "10px 16px",
+  borderRadius: "var(--radius-pill)",
+  border: "1.5px solid var(--color-accent)",
+  background: "color-mix(in srgb, var(--color-accent) 16%, transparent)",
+  color: "var(--color-text)",
+  fontWeight: 700,
+  fontSize: 14,
+  margin: "var(--space-2) 0",
+};
