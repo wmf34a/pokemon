@@ -8,6 +8,7 @@ import ChosungQuiz from "./pages/ChosungQuiz";
 import CryQuiz from "./pages/CryQuiz";
 import EvolutionQuiz from "./pages/EvolutionQuiz";
 import ZoomQuiz from "./pages/ZoomQuiz";
+import TypeQuiz from "./pages/TypeQuiz";
 import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
 
@@ -23,6 +24,7 @@ export default function App() {
       <Route path="/quiz/cry" element={<CryQuiz />} />
       <Route path="/quiz/evolution" element={<EvolutionQuiz />} />
       <Route path="/quiz/zoom" element={<ZoomQuiz />} />
+      <Route path="/quiz/type" element={<TypeQuiz />} />
       <Route path="/mine/choose" element={<ChooseStarter />} />
       <Route path="/mine" element={<MyPokemon />} />
     </Routes>

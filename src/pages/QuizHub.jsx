@@ -16,7 +16,7 @@ const MODES = [
   { key: "silhouette", icon: GlassesIcon, title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", ready: true },
   { key: "cry", icon: VolumeIcon, title: "울음소리 퀴즈", desc: "소리만 듣고 맞히기", ready: true },
   { key: "chosung", icon: PuzzleIcon, title: "초성 퀴즈", desc: "초성 + 특징으로 맞히기", ready: true },
-  { key: "type", icon: SwordsIcon, title: "타입 상성 퀴즈", desc: "효과가 굉장한 타입 고르기", ready: false },
+  { key: "type", icon: SwordsIcon, title: "타입 퀴즈", desc: "제시된 타입을 가진 포켓몬 고르기", ready: true },
   { key: "evolution", icon: ShuffleIcon, title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", ready: true },
   { key: "zoom", icon: SearchIcon, title: "누구냔 넌", desc: "확대된 일부만 보고 맞히기", ready: true },
   { key: "updown", icon: HashIcon, title: "도감번호 업다운", desc: "숫자야구 스타일", ready: false },

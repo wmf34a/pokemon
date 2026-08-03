@@ -22,6 +22,9 @@ describe("QuizHub", () => {
 
     const zoomLink = screen.getByRole("link", { name: /누구냔 넌/ });
     expect(zoomLink).toHaveAttribute("href", "/quiz/zoom");
+
+    const typeLink = screen.getByRole("link", { name: /타입 퀴즈/ });
+    expect(typeLink).toHaveAttribute("href", "/quiz/type");
   });
 
   it("준비중인 모드는 '준비중' 표시를 보여준다", () => {
