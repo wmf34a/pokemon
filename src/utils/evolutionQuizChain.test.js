@@ -67,7 +67,10 @@ describe("pickEvolutionQuizChain", () => {
   });
 
   it("후보 중 하나를 골라 2~3단계짜리 체인을 반환한다", () => {
-    const chain = pickEvolutionQuizChain(all);
+    // brokenLink는 무작위로 뽑히면 항상 null이 나오는 방어적 케이스라(위 테스트에서
+    // 별도로 검증) 이 성공 경로 테스트에서는 제외해 결과가 항상 결정적이게 한다.
+    const validCandidates = [bulbasaur, ivysaur, venusaur, eevee, vaporeon, jolteon];
+    const chain = pickEvolutionQuizChain(validCandidates);
     expect(chain).not.toBe(null);
     expect(chain.length).toBeGreaterThanOrEqual(2);
     expect(chain.length).toBeLessThanOrEqual(3);
