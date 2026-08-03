@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { loadPokemonData, TYPE_COLOR } from "../utils/pokemonData";
+import { buildEvolutionFamily } from "../utils/evolutionFamily";
 import TypeBadge from "../components/TypeBadge";
 import AudioButton from "../components/AudioButton";
 import { GlassesIcon } from "../components/Icons";
@@ -9,10 +10,12 @@ import { GlassesIcon } from "../components/Icons";
 export default function PokemonDetail() {
   const { id } = useParams();
   const [p, setP] = useState(null);
+  const [all, setAll] = useState([]);
 
   useEffect(() => {
-    loadPokemonData().then((all) => {
-      setP(all.find((x) => String(x.id) === String(id)) || null);
+    loadPokemonData().then((data) => {
+      setAll(data);
+      setP(data.find((x) => String(x.id) === String(id)) || null);
     });
   }, [id]);
 
@@ -27,6 +30,8 @@ export default function PokemonDetail() {
   }
 
   const tint = TYPE_COLOR[p.types[0]] || "#999";
+  const family = buildEvolutionFamily(p, all);
+  const hasFamily = family.flat().length > 1;
 
   return (
     <AppShell title={p.nameKo} backTo="/dex">
@@ -72,6 +77,41 @@ export default function PokemonDetail() {
         </Section>
       )}
 
+      {hasFamily && (
+        <Section label="진화">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: 6,
+            }}
+          >
+            {family.map((stage, i) => (
+              <div key={stage[0].id} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {i > 0 && (
+                  <span style={{ fontSize: 18, color: "var(--color-text-muted)" }}>→</span>
+                )}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    gap: 6,
+                    maxWidth: stage.length > 1 ? 150 : undefined,
+                  }}
+                >
+                  {stage.map((sp) => (
+                    <EvolutionFamilyCard key={sp.id} pokemon={sp} isCurrent={sp.id === p.id} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
       <Link
         to="/quiz/silhouette"
         className="press pop-card"
@@ -110,6 +150,41 @@ function StatBox({ label, value }) {
       <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{label}</div>
       <div style={{ fontWeight: 700, fontSize: 17, marginTop: 2 }}>{value}</div>
     </div>
+  );
+}
+
+function EvolutionFamilyCard({ pokemon: sp, isCurrent }) {
+  const card = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 2,
+        padding: 6,
+        minWidth: 64,
+        borderRadius: "var(--radius-md)",
+        border: isCurrent ? "2px solid var(--color-primary)" : "1px solid transparent",
+        background: isCurrent ? "var(--color-surface-2)" : "transparent",
+      }}
+    >
+      <img
+        src={sp.artwork}
+        alt={sp.nameKo}
+        style={{ width: 48, height: 48, objectFit: "contain" }}
+      />
+      <span style={{ fontSize: 11, color: "var(--color-text)", textAlign: "center" }}>
+        {sp.nameKo}
+      </span>
+    </div>
+  );
+
+  if (isCurrent) return card;
+
+  return (
+    <Link to={`/pokemon/${sp.id}`} style={{ textDecoration: "none" }}>
+      {card}
+    </Link>
   );
 }
 
