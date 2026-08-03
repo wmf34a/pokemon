@@ -4,6 +4,7 @@ import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
 import { loadPokemonData, TYPE_LABEL_KO, applyGen1OnlyFilter } from "../utils/pokemonData";
 import { pickEvolutionQuizChain } from "../utils/evolutionQuizChain";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
+import EvolutionToast from "../components/EvolutionToast";
 import { primaryBtn, hintBtn } from "../styles/tokens";
 
 const HINT_STEPS = ["type", "description"];
@@ -20,6 +21,7 @@ export default function EvolutionQuiz() {
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(0);
   const awardPoints = useAwardPoints();
+  const [evolutionResult, setEvolutionResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -39,6 +41,7 @@ export default function EvolutionQuiz() {
     setHintLevel(0);
     setRevealed(false);
     setCorrect(null);
+    setEvolutionResult(null);
     setRound((r) => r + 1);
   }, [all]);
 
@@ -57,7 +60,7 @@ export default function EvolutionQuiz() {
 
   const start = chain[0];
 
-  function handleTap(id) {
+  async function handleTap(id) {
     if (revealed || tappedIds.includes(id)) return;
     const updated = [...tappedIds, id];
     setTappedIds(updated);
@@ -68,7 +71,7 @@ export default function EvolutionQuiz() {
       if (isCorrect) {
         const earned = Math.max(30 - hintLevel * 10, 10);
         setScore((s) => s + earned);
-        awardPoints(earned);
+        setEvolutionResult(await awardPoints(earned));
       }
     }
   }
@@ -195,6 +198,7 @@ export default function EvolutionQuiz() {
         {revealed && (
           <div style={{ marginTop: 16 }}>
             <ResultHeading correct={correct} />
+            <EvolutionToast result={evolutionResult} />
             <p>
               정답 순서는 <b>{chain.map((p) => p.nameKo).join(" → ")}</b> 였습니다.
             </p>
