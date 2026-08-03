@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import AudioButton from "../components/AudioButton";
+import QuizResultScreen from "../components/QuizResultScreen";
 import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
 import {
   loadPokemonData,
@@ -94,30 +94,13 @@ export default function SilhouetteQuiz() {
 
   if (sessionComplete) {
     return (
-      <AppShell title="실루엣 퀴즈" backTo="/quiz">
-        <div style={{ textAlign: "center", marginTop: "var(--space-6)" }}>
-          <h2>세션 완료!</h2>
-          <p style={{ marginTop: 8, fontSize: 15 }}>
-            {sessionQuestions.length}문제 중 <b>{correctCount}문제</b> 정답 · 총{" "}
-            <b>{score}점</b>
-          </p>
-          <button onClick={startSession} style={primaryBtn}>
-            다시 하기
-          </button>
-          <div style={{ marginTop: 8 }}>
-            <Link
-              to="/quiz"
-              style={{
-                color: "var(--color-text-muted)",
-                fontSize: 13,
-                textDecoration: "underline",
-              }}
-            >
-              퀴즈 목록으로
-            </Link>
-          </div>
-        </div>
-      </AppShell>
+      <QuizResultScreen
+        title="실루엣 퀴즈"
+        total={sessionQuestions.length}
+        correctCount={correctCount}
+        score={score}
+        onPlayAgain={startSession}
+      />
     );
   }
 
