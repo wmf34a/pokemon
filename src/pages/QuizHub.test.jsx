@@ -14,9 +14,6 @@ describe("QuizHub", () => {
     const silhouetteLink = screen.getByRole("link", { name: /실루엣 퀴즈/ });
     expect(silhouetteLink).toHaveAttribute("href", "/quiz/silhouette");
 
-    const chosungLink = screen.getByRole("link", { name: /초성 퀴즈/ });
-    expect(chosungLink).toHaveAttribute("href", "/quiz/chosung");
-
     const evolutionLink = screen.getByRole("link", { name: /진화 순서 맞추기/ });
     expect(evolutionLink).toHaveAttribute("href", "/quiz/evolution");
 
@@ -27,13 +24,13 @@ describe("QuizHub", () => {
     expect(typeLink).toHaveAttribute("href", "/quiz/type");
   });
 
-  it("준비중인 모드는 '준비중' 표시를 보여준다", () => {
+  it("모든 모드가 구현되어 있으면 '준비중' 표시가 없다", () => {
     render(
       <MemoryRouter>
         <QuizHub />
       </MemoryRouter>
     );
 
-    expect(screen.getAllByText("준비중").length).toBeGreaterThan(0);
+    expect(screen.queryByText("준비중")).not.toBeInTheDocument();
   });
 });

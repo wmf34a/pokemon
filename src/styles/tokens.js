@@ -1,4 +1,4 @@
-// 퀴즈 페이지들(SilhouetteQuiz/ChosungQuiz/CryQuiz)이 공유하는 인라인 스타일.
+// 퀴즈 페이지들(SilhouetteQuiz/CryQuiz/ZoomQuiz 등)이 공유하는 인라인 스타일.
 // index.css의 CSS 변수를 그대로 참조해 색/반경/그림자를 한 곳에서 관리한다.
 
 export const card = {

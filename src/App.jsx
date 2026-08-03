@@ -4,7 +4,6 @@ import Dex from "./pages/Dex";
 import PokemonDetail from "./pages/PokemonDetail";
 import QuizHub from "./pages/QuizHub";
 import SilhouetteQuiz from "./pages/SilhouetteQuiz";
-import ChosungQuiz from "./pages/ChosungQuiz";
 import CryQuiz from "./pages/CryQuiz";
 import EvolutionQuiz from "./pages/EvolutionQuiz";
 import ZoomQuiz from "./pages/ZoomQuiz";
@@ -20,7 +19,6 @@ export default function App() {
       <Route path="/pokemon/:id" element={<PokemonDetail />} />
       <Route path="/quiz" element={<QuizHub />} />
       <Route path="/quiz/silhouette" element={<SilhouetteQuiz />} />
-      <Route path="/quiz/chosung" element={<ChosungQuiz />} />
       <Route path="/quiz/cry" element={<CryQuiz />} />
       <Route path="/quiz/evolution" element={<EvolutionQuiz />} />
       <Route path="/quiz/zoom" element={<ZoomQuiz />} />
