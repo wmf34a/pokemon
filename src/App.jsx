@@ -10,6 +10,7 @@ import ZoomQuiz from "./pages/ZoomQuiz";
 import TypeQuiz from "./pages/TypeQuiz";
 import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
+import MoreMenu from "./pages/MoreMenu";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/quiz/type" element={<TypeQuiz />} />
       <Route path="/mine/choose" element={<ChooseStarter />} />
       <Route path="/mine" element={<MyPokemon />} />
+      <Route path="/more" element={<MoreMenu />} />
     </Routes>
   );
 }
