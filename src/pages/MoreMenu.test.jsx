@@ -20,7 +20,7 @@ describe("MoreMenu", () => {
         <MoreMenu />
       </MemoryRouter>
     );
-    const link = screen.getByRole("link", { name: /포켓몬 키우기/ });
+    const link = screen.getByRole("link", { name: /일일 미션/ });
     expect(link).toHaveAttribute("aria-disabled", "true");
     expect(screen.getAllByText("준비중").length).toBeGreaterThan(0);
   });
