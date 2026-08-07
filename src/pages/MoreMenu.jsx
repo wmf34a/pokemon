@@ -4,7 +4,7 @@ import { CalendarIcon, LayersIcon, HeartIcon, ClipboardCheckIcon } from "../comp
 
 export const MODES = [
   { key: "daily", icon: CalendarIcon, title: "오늘의 포켓몬", desc: "매일 새로운 포켓몬을 만나보세요", to: "/daily", ready: true },
-  { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈를 풀고 카드를 모아보세요", to: "/collection", ready: false },
+  { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈를 풀고 카드를 모아보세요", to: "/collection", ready: true },
   { key: "care", icon: HeartIcon, title: "포켓몬 키우기", desc: "매일 돌보며 애착을 키워요", to: "/care", ready: false },
   { key: "missions", icon: ClipboardCheckIcon, title: "일일 미션", desc: "오늘의 습관을 완료하고 카드 받기", to: "/missions", ready: false },
 ];

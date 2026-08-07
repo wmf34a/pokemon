@@ -12,6 +12,7 @@ import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
 import MoreMenu from "./pages/MoreMenu";
 import DailyPokemon from "./pages/DailyPokemon";
+import CardCollection from "./pages/CardCollection";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/mine" element={<MyPokemon />} />
       <Route path="/more" element={<MoreMenu />} />
       <Route path="/daily" element={<DailyPokemon />} />
+      <Route path="/collection" element={<CardCollection />} />
     </Routes>
   );
 }
