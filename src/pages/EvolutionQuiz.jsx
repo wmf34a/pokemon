@@ -11,7 +11,9 @@ import {
 } from "../utils/pokemonData";
 import { getEvolutionQuizCandidates, buildEvolutionChain } from "../utils/evolutionQuizChain";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
+import { awardCard } from "../utils/cardCollection";
 import EvolutionToast from "../components/EvolutionToast";
+import CardToast from "../components/CardToast";
 import { primaryBtn, hintBtn } from "../styles/tokens";
 
 const HINT_STEPS = ["type", "description"];
@@ -39,6 +41,7 @@ export default function EvolutionQuiz() {
   const [score, setScore] = useState(0);
   const awardPoints = useAwardPoints();
   const [evolutionResult, setEvolutionResult] = useState(null);
+  const [cardResult, setCardResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -122,6 +125,7 @@ export default function EvolutionQuiz() {
         setScore((s) => s + earned);
         setCorrectCount((c) => c + 1);
         setEvolutionResult(await awardPoints(earned));
+        setCardResult(awardCard(start.id));
       }
     }
   }
@@ -249,6 +253,7 @@ export default function EvolutionQuiz() {
           <div style={{ marginTop: 16 }}>
             <ResultHeading correct={correct} />
             <EvolutionToast result={evolutionResult} />
+            <CardToast result={cardResult} pokemonName={start.nameKo} />
             <p>
               정답 순서는 <b>{chain.map((p) => p.nameKo).join(" → ")}</b> 였습니다.
             </p>

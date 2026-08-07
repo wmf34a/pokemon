@@ -3,6 +3,7 @@ import AppShell from "../components/AppShell";
 import QuizResultScreen from "../components/QuizResultScreen";
 import TypeBadge from "../components/TypeBadge";
 import EvolutionToast from "../components/EvolutionToast";
+import CardToast from "../components/CardToast";
 import { CheckIcon, XCircleIcon } from "../components/Icons";
 import {
   loadPokemonData,
@@ -12,6 +13,7 @@ import {
 } from "../utils/pokemonData";
 import { typesMatch } from "../utils/typeMatch";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
+import { awardCard } from "../utils/cardCollection";
 import { primaryBtn } from "../styles/tokens";
 
 // 힌트 단계가 없는 대신(외형만 보고 판단해야 트릭이 성립하므로) 정답 시 항상
@@ -32,6 +34,7 @@ export default function TypeQuiz() {
   const [score, setScore] = useState(0);
   const awardPoints = useAwardPoints();
   const [evolutionResult, setEvolutionResult] = useState(null);
+  const [cardResult, setCardResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -110,6 +113,7 @@ export default function TypeQuiz() {
       setScore((s) => s + FLAT_SCORE);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(FLAT_SCORE));
+      setCardResult(awardCard(target.id));
     }
   }
 
@@ -160,6 +164,7 @@ export default function TypeQuiz() {
           <div style={{ marginTop: 16 }}>
             <ResultHeading correct={correct} />
             <EvolutionToast result={evolutionResult} />
+            <CardToast result={cardResult} pokemonName={target.nameKo} />
             <img
               src={target.artwork}
               alt={target.nameKo}

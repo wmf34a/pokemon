@@ -13,6 +13,8 @@ import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
 import EvolutionToast from "../components/EvolutionToast";
+import { awardCard } from "../utils/cardCollection";
+import CardToast from "../components/CardToast";
 
 const HINT_STEPS = ["type", "silhouette", "chosung"];
 
@@ -33,6 +35,7 @@ export default function CryQuiz() {
   const audioRef = useRef(null);
   const awardPoints = useAwardPoints();
   const [evolutionResult, setEvolutionResult] = useState(null);
+  const [cardResult, setCardResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -130,6 +133,7 @@ export default function CryQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
+      setCardResult(awardCard(answer.id));
     }
   }
 
@@ -144,6 +148,7 @@ export default function CryQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
+      setCardResult(awardCard(answer.id));
     }
   }
 
@@ -276,6 +281,7 @@ export default function CryQuiz() {
             />
             <ResultHeading correct={correct} />
             <EvolutionToast result={evolutionResult} />
+            <CardToast result={cardResult} pokemonName={answer.nameKo} />
             <p>
               정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
             </p>

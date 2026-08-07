@@ -12,6 +12,8 @@ import {
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
 import EvolutionToast from "../components/EvolutionToast";
+import { awardCard } from "../utils/cardCollection";
+import CardToast from "../components/CardToast";
 
 // 힌트를 누를 때마다(0~3단계) 배경 확대 배율이 점점 줄어들어 조금씩 더 넓은 범위가
 // 보인다. 정답을 맞히기 전까지는 마지막 단계(140%)에서도 전체 모습은 보이지 않는다.
@@ -40,6 +42,7 @@ export default function ZoomQuiz() {
   const [typedGuess, setTypedGuess] = useState("");
   const awardPoints = useAwardPoints();
   const [evolutionResult, setEvolutionResult] = useState(null);
+  const [cardResult, setCardResult] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then((data) => {
@@ -124,6 +127,7 @@ export default function ZoomQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
+      setCardResult(awardCard(answer.id));
     }
   }
 
@@ -138,6 +142,7 @@ export default function ZoomQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
+      setCardResult(awardCard(answer.id));
     }
   }
 
@@ -232,6 +237,7 @@ export default function ZoomQuiz() {
           <div style={{ marginTop: 16 }}>
             <ResultHeading correct={correct} />
             <EvolutionToast result={evolutionResult} />
+            <CardToast result={cardResult} pokemonName={answer.nameKo} />
             <p>
               정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
             </p>
