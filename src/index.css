@@ -11,6 +11,12 @@
   --color-danger: #e3350d; /* poke-ball red */
   --color-success: #22a559;
 
+  /* 카드 수집 등급 */
+  --card-grade-common: #b9b9c2;
+  --card-grade-uncommon: #2f9e44;
+  --card-grade-rare: #3b82f6;
+  --card-grade-legendary: #c99a2e;
+
   /* Surfaces */
   --color-bg: #f7f7fa;
   --color-surface: #ffffff;
@@ -63,6 +69,11 @@
     --color-accent-ink: #1f3864;
     --color-danger: #ff6b52;
     --color-success: #3ecb7e;
+
+    --card-grade-common: #7a7a86;
+    --card-grade-uncommon: #4ade80;
+    --card-grade-rare: #7ea1e0;
+    --card-grade-legendary: #f2c31a;
     --color-bg: #131418;
     --color-surface: #1c1e24;
     --color-surface-2: #24262e;
@@ -84,6 +95,10 @@
   --color-primary-ink: #dce7f9;
   --color-danger: #ff6b52;
   --color-success: #3ecb7e;
+  --card-grade-common: #7a7a86;
+  --card-grade-uncommon: #4ade80;
+  --card-grade-rare: #7ea1e0;
+  --card-grade-legendary: #f2c31a;
   --color-bg: #131418;
   --color-surface: #1c1e24;
   --color-surface-2: #24262e;
@@ -102,6 +117,10 @@
   --color-primary: #1f3864;
   --color-danger: #e3350d;
   --color-success: #22a559;
+  --card-grade-common: #b9b9c2;
+  --card-grade-uncommon: #2f9e44;
+  --card-grade-rare: #3b82f6;
+  --card-grade-legendary: #c99a2e;
   --color-bg: #f7f7fa;
   --color-surface: #ffffff;
   --color-surface-2: #f0f1f5;
@@ -246,5 +265,57 @@ img {
   }
   .evolution-shimmer-ring {
     animation: evolution-shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes card-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(201, 154, 46, 0);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px color-mix(in srgb, var(--card-grade-legendary) 55%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card-toast-legendary {
+    animation: card-glow 1.2s ease-in-out infinite;
+  }
+}
+
+.card-flip-outer {
+  display: block;
+  position: relative;
+  width: 100%;
+  perspective: 1000px;
+}
+
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 480ms;
+  transform-style: preserve-3d;
+}
+
+.card-flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.card-flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-flip-inner {
+    transition: none;
   }
 }
