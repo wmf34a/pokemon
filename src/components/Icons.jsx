@@ -228,3 +228,53 @@ export function SparklesIcon(props) {
     </Base>
   );
 }
+
+export function CalendarIcon(props) {
+  return (
+    <Base {...props}>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" />
+      <circle cx="8" cy="14" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="14" r="1" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none" />
+    </Base>
+  );
+}
+
+export function LayersIcon(props) {
+  return (
+    <Base {...props}>
+      <path d="M12 3.5 4 8l8 4.5L20 8z" />
+      <path d="M4 12.5 12 17l8-4.5M4 16.5 12 21l8-4.5" />
+    </Base>
+  );
+}
+
+export function HeartIcon(props) {
+  return (
+    <Base {...props}>
+      <path d="M12 20.5 4.5 13a5 5 0 0 1 7.5-6.6 5 5 0 0 1 7.5 6.6z" />
+    </Base>
+  );
+}
+
+export function ClipboardCheckIcon(props) {
+  return (
+    <Base {...props}>
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+      <path d="M8.5 13 11 15.5 15.5 10" />
+    </Base>
+  );
+}
+
+export function GridIcon(props) {
+  return (
+    <Base {...props}>
+      <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13" y="3.5" width="7.5" height="7.5" rx="1.5" />
+      <rect x="3.5" y="13" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13" y="13" width="7.5" height="7.5" rx="1.5" />
+    </Base>
+  );
+}
