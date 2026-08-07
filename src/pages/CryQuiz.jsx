@@ -70,6 +70,7 @@ export default function CryQuiz() {
       setRevealed(false);
       setCorrect(null);
       setEvolutionResult(null);
+      setCardResult(null);
       setTypedGuess("");
     },
     [all]

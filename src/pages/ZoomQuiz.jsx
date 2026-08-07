@@ -78,6 +78,7 @@ export default function ZoomQuiz() {
       setRevealed(false);
       setCorrect(null);
       setEvolutionResult(null);
+      setCardResult(null);
       setTypedGuess("");
     },
     [all]

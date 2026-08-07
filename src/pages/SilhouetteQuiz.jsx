@@ -75,6 +75,7 @@ export default function SilhouetteQuiz() {
       setRevealed(false);
       setCorrect(null);
       setEvolutionResult(null);
+      setCardResult(null);
       setTypedGuess("");
     },
     [all]

@@ -73,6 +73,7 @@ export default function EvolutionQuiz() {
     setRevealed(false);
     setCorrect(null);
     setEvolutionResult(null);
+    setCardResult(null);
   }, []);
 
   useEffect(() => {

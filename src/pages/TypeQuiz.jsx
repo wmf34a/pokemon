@@ -66,6 +66,7 @@ export default function TypeQuiz() {
       setRevealed(false);
       setCorrect(null);
       setEvolutionResult(null);
+      setCardResult(null);
     },
     [all]
   );

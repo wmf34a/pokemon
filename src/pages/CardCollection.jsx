@@ -137,7 +137,7 @@ export default function CardCollection() {
                       특성: {p.abilities.map(formatAbility).join(", ")}
                     </div>
                     <p style={{ fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.4 }}>
-                      {p.descriptionKo}
+                      {p.descriptionKo || p.descriptionEn}
                     </p>
                   </div>
                 )}
