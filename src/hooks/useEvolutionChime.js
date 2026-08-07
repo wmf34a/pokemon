@@ -28,6 +28,7 @@ export function useEvolutionChime() {
     try {
       const ctx = getAudioContext();
       if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
 
       let startTime = ctx.currentTime;
       CHIME_NOTES_HZ.forEach((freq) => {
