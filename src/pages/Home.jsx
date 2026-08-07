@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { SparklesIcon } from "../components/Icons";
 import { loadPokemonData } from "../utils/pokemonData";
+import { useDailyPokemon } from "../hooks/useDailyPokemon";
 import {
   getMyPokemon,
   resolveBranchEvolution,
@@ -12,6 +13,7 @@ import {
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
+  const dailyPokemon = useDailyPokemon();
   const [all, setAll] = useState([]);
   // null | "branch" (분기 선택 대기) | "reveal" (짠! 화면)
   const [celebrationStep, setCelebrationStep] = useState(null);
@@ -325,6 +327,31 @@ export default function Home() {
           </Link>
         )}
       </div>
+
+      {dailyPokemon && (
+        <Link
+          to="/daily"
+          className="press pop-card"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            marginTop: "var(--space-4)",
+            padding: "var(--space-3) var(--space-4)",
+            borderRadius: "var(--radius-lg)",
+            background: "var(--color-surface)",
+            boxShadow: "var(--shadow-card)",
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
+          <img src={dailyPokemon.artwork} alt="" style={{ width: 44, height: 44 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>오늘의 포켓몬</div>
+            <div style={{ fontWeight: 700 }}>{dailyPokemon.nameKo}</div>
+          </div>
+        </Link>
+      )}
 
       <p style={{ marginTop: "var(--space-10)", fontSize: 12, color: "var(--color-text-muted)", lineHeight: 1.6 }}>
         본 앱은 팬이 제작한 비공식 프로젝트이며 Nintendo, Game Freak, The

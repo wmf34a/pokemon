@@ -11,6 +11,7 @@ import TypeQuiz from "./pages/TypeQuiz";
 import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
 import MoreMenu from "./pages/MoreMenu";
+import DailyPokemon from "./pages/DailyPokemon";
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/mine/choose" element={<ChooseStarter />} />
       <Route path="/mine" element={<MyPokemon />} />
       <Route path="/more" element={<MoreMenu />} />
+      <Route path="/daily" element={<DailyPokemon />} />
     </Routes>
   );
 }
