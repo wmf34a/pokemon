@@ -202,6 +202,22 @@ describe("통계", () => {
     expect(getTodayCompletedCount(now)).toBe(2);
   });
 
+  it("더 이상 존재하지 않는 미션의 완료 기록은 오늘 완료 수에 안 잡힌다(완료 X/Y 표시가 항상 앞뒤 맞게)", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    const { mission } = addCustomMission("임시미션", now);
+    completeMission(mission.id, 1, () => 0, now);
+    expect(getTodayCompletedCount(now)).toBe(1);
+
+    // removeCustomMission 가드가 생기기 전처럼 미션 카탈로그만 지워진 상태를
+    // 재현한다(가드가 있는 정식 API로는 오늘 완료한 미션을 못 지운다).
+    localStorage.setItem(
+      "pokemonMissions.custom.v1",
+      JSON.stringify(getCustomMissions().filter((m) => m.id !== mission.id))
+    );
+
+    expect(getTodayCompletedCount(now)).toBe(0);
+  });
+
   it("getWeeklyCompletedCount는 이번 주(월요일부터) 완료 수를 센다", () => {
     const monday = new Date("2026-08-03T09:00:00.000Z"); // 2026-08-03은 월요일
     const friday = new Date("2026-08-07T09:00:00.000Z");

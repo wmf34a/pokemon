@@ -141,9 +141,17 @@ export function getMissionsWithStatus(now = new Date()) {
   });
 }
 
+// "오늘 완료 X/Y" 표시에 쓰는 값이라, Y(getAllMissions().length)와 항상 앞뒤가
+// 맞아야 한다. 커스텀 미션은 완료한 당일엔 삭제할 수 없지만(파밍 방지 가드),
+// 완료하지 않은 날 삭제되었거나 그보다 예전에(가드가 없던 버전 등으로) 지워진
+// 미션의 완료 기록은 여전히 로그에 남아있을 수 있으므로, 지금 실제로 존재하는
+// 미션의 기록만 센다 — 그래야 X가 현재 미션 수 Y를 넘는 일이 없다.
 export function getTodayCompletedCount(now = new Date()) {
   const today = todayDateString(now);
-  return readLog().filter((e) => e.date === today && e.missionId !== BONUS_MISSION_ID).length;
+  const currentMissionIds = new Set(getAllMissions().map((m) => m.id));
+  return readLog().filter(
+    (e) => e.date === today && e.missionId !== BONUS_MISSION_ID && currentMissionIds.has(e.missionId)
+  ).length;
 }
 
 // 실제로 카드가 지급된 완료(일반 + 보너스 합산) 수 — 상한 판정과 "오늘 획득
