@@ -287,7 +287,7 @@ export default function CryQuiz() {
               정답은 <b>{answer.nameKo}</b> ({answer.nameEn}) 이었습니다.
             </p>
             <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 8 }}>
-              {answer.descriptionKo || answer.descriptionEn}
+              {answer.descriptionKo || "한글 설명이 아직 없어요"}
             </p>
             <button onClick={goToNext} style={primaryBtn}>
               다음 문제 →

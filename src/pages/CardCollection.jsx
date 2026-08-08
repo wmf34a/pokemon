@@ -4,13 +4,6 @@ import TypeBadge from "../components/TypeBadge";
 import { loadPokemonData } from "../utils/pokemonData";
 import { getCards, GRADES, GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
 
-function formatAbility(slug) {
-  return slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
 // null = 전체, "owned" = 보유만, 그 외에는 GRADES 값 중 하나(해당 등급만)
 const FILTERS = [
   { value: null, label: "전체" },
@@ -187,10 +180,10 @@ export default function CardCollection() {
                       ))}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
-                      특성: {p.abilities.map(formatAbility).join(", ")}
+                      특성: {(p.abilitiesKo || p.abilities).join(", ")}
                     </div>
                     <p style={{ fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.4 }}>
-                      {p.descriptionKo || p.descriptionEn}
+                      {p.descriptionKo || "한글 설명이 아직 없어요"}
                     </p>
                   </div>
                 )}

@@ -15,6 +15,7 @@ const bulbasaur = {
   nameKo: "이상해씨",
   types: ["grass", "poison"],
   abilities: ["overgrow"],
+  abilitiesKo: ["심록"],
   descriptionKo: "설명입니다.",
   sprite: "https://example.com/1.png",
 };
@@ -23,6 +24,7 @@ const pikachu = {
   nameKo: "피카츄",
   types: ["electric"],
   abilities: ["static"],
+  abilitiesKo: ["정전기"],
   descriptionKo: "전기를 모은다.",
   sprite: "https://example.com/25.png",
 };

@@ -34,6 +34,10 @@ const CONCURRENCY = 8; // PokeAPI에 과도한 동시 요청을 보내지 않기
 // 중복 fetch가 발생하지 않는다.
 const chainCache = new Map();
 
+// 특성(ability)도 진화 체인과 같은 이유로 캐싱한다 — 전체 species(~1025개)에
+// 비해 고유 특성 수(~280개)가 훨씬 적고, 여러 포켓몬이 같은 특성을 공유한다.
+const abilityKoCache = new Map();
+
 async function fetchJson(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed ${url}: ${res.status}`);
@@ -76,6 +80,24 @@ function fetchChain(url) {
   return chainCache.get(url);
 }
 
+// 특성 하나의 한글 이름을 캐시에서 가져오거나, 없으면 fetch 후 캐시에 저장한다.
+// 실패해도 throw하지 않고 영어 슬러그로 폴백해 빌드 전체를 막지 않는다.
+function fetchAbilityKoName(ability) {
+  const { name, url } = ability;
+  if (!abilityKoCache.has(name)) {
+    abilityKoCache.set(
+      name,
+      fetchJson(url)
+        .then((data) => pickKoName(data.names, name))
+        .catch((err) => {
+          console.warn(`  ability ko name fetch failed for ${name}: ${err.message}`);
+          return name;
+        })
+    );
+  }
+  return abilityKoCache.get(name);
+}
+
 async function fetchOne(id) {
   const [pokemon, species] = await Promise.all([
     fetchJson(`${POKEAPI}/pokemon/${id}`),
@@ -88,6 +110,10 @@ async function fetchOne(id) {
     ? extractEvolutionInfo(chainRoot, species.name)
     : { evolutionStage: 1, evolvesFrom: null, evolvesTo: [] };
 
+  const abilitiesKo = await Promise.all(
+    pokemon.abilities.map((a) => fetchAbilityKoName(a.ability))
+  );
+
   return {
     id: pokemon.id,
     nameEn: pokemon.name,
@@ -97,6 +123,7 @@ async function fetchOne(id) {
     height: pokemon.height / 10, // m
     weight: pokemon.weight / 10, // kg
     abilities: pokemon.abilities.map((a) => a.ability.name),
+    abilitiesKo,
     descriptionKo: pickKoFlavorText(species.flavor_text_entries, ""),
     descriptionEn: pickEnFlavorText(species.flavor_text_entries),
     generation: species.generation?.name || "",

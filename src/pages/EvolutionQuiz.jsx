@@ -247,7 +247,7 @@ export default function EvolutionQuiz() {
               <b>{start.types.map((t) => TYPE_LABEL_KO[t] || t).join(", ")}</b> 입니다.
             </HintLine>
           )}
-          {hintLevel >= 2 && <HintLine>{start.descriptionKo || start.descriptionEn}</HintLine>}
+          {hintLevel >= 2 && <HintLine>{start.descriptionKo || "한글 설명이 아직 없어요"}</HintLine>}
         </div>
 
         {revealed && (

@@ -64,11 +64,11 @@ export default function PokemonDetail() {
       </div>
 
       <Section label="특성">
-        <p style={{ margin: 0 }}>{p.abilities.join(", ")}</p>
+        <p style={{ margin: 0 }}>{(p.abilitiesKo || p.abilities).join(", ")}</p>
       </Section>
 
       <Section label="설명">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>{p.descriptionKo || p.descriptionEn}</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>{p.descriptionKo || "한글 설명이 아직 없어요"}</p>
       </Section>
 
       {p.cry && (
