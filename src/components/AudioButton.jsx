@@ -17,7 +17,7 @@ export default function AudioButton({ src, label = "울음소리 듣기", trackK
     const audio = audioRef.current;
     if (!audio) return;
     audio.currentTime = 0;
-    audio.play().catch(() => {});
+    audio.play()?.catch(() => {}); // 일부 환경(jsdom 등)은 play()가 Promise를 반환하지 않는다
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackKey, autoPlay]);
 
@@ -28,7 +28,7 @@ export default function AudioButton({ src, label = "울음소리 듣기", trackK
       audio.pause();
     } else {
       audio.currentTime = 0;
-      audio.play().catch(() => {});
+      audio.play()?.catch(() => {}); // 일부 환경(jsdom 등)은 play()가 Promise를 반환하지 않는다
     }
   }
 
