@@ -1,6 +1,8 @@
-// 미션 완료 시 재생하는 짧은 "딩" 1음. useEvolutionChime.js와 같은 패턴
-// (외부 에셋 없이 Web Audio API로 합성, 실패해도 절대 throw하지 않음)이지만
-// 진화 축하음(3음 상승 아르페지오)과는 구분되는 별도 이벤트라 독립된 훅으로 둔다.
+// 포켓몬 카드를 획득/공개할 때 재생하는 짧은 "딩" 1음 — 퀴즈 정답으로 뜨는
+// CardToast와 일일 미션의 CardRevealModal이 함께 쓴다. useEvolutionChime.js와
+// 같은 패턴(외부 에셋 없이 Web Audio API로 합성, 실패해도 절대 throw하지
+// 않음)이지만 진화 축하음(3음 상승 아르페지오)과는 구분되는 별도 이벤트라
+// 독립된 훅으로 둔다.
 
 let sharedContext = null;
 
@@ -21,7 +23,7 @@ function getAudioContext() {
 const DING_HZ = 880; // A5
 const DING_DURATION_S = 0.15;
 
-export function useMissionChime() {
+export function useCardChime() {
   return function playChime() {
     try {
       const ctx = getAudioContext();

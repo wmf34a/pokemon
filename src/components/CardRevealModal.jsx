@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
+import { useCardChime } from "../hooks/useCardChime";
 
 export default function CardRevealModal({ result, pokemon, onClose }) {
   const [revealed, setRevealed] = useState(false);
+  const playChime = useCardChime();
 
   useEffect(() => {
     if (!result) return undefined;
     setRevealed(false);
-    const timer = setTimeout(() => setRevealed(true), 500);
+    const timer = setTimeout(() => {
+      setRevealed(true);
+      playChime(); // 카드가 뒤집혀 실제로 보이는 순간에 맞춰서 소리 재생
+    }, 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
 
   if (!result || !pokemon) return null;

@@ -1,6 +1,15 @@
+import { useEffect } from "react";
 import { GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
+import { useCardChime } from "../hooks/useCardChime";
 
 export default function CardToast({ result, pokemonName }) {
+  const playChime = useCardChime();
+
+  useEffect(() => {
+    if (result?.isNew) playChime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
   if (!result?.isNew) return null;
 
   const color = GRADE_COLOR_VAR[result.grade] || GRADE_COLOR_VAR.common;

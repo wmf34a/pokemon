@@ -18,12 +18,12 @@ import {
   DAILY_CARD_CAP,
 } from "../utils/dailyMission";
 import { vibrate } from "../utils/haptics";
-import { useMissionChime } from "../hooks/useMissionChime";
 
 const ERROR_LABEL_KO = {
   empty: "미션 이름을 입력해주세요",
   too_long: "미션 이름은 20자 이하로 적어주세요",
   limit_reached: "커스텀 미션은 최대 10개까지 추가할 수 있어요",
+  daily_limit_reached: "새 미션은 하루 2개까지만 추가할 수 있어요",
 };
 
 function formatTime(iso) {
@@ -38,7 +38,6 @@ export default function DailyMission() {
   const [customError, setCustomError] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
   const [revealQueue, setRevealQueue] = useState([]);
-  const playChime = useMissionChime();
 
   useEffect(() => {
     loadPokemonData().then(setAll);
@@ -71,8 +70,7 @@ export default function DailyMission() {
       if (bonusResult) queue.push({ result: bonusResult, pokemon: bonusPicked });
     }
 
-    playChime();
-    vibrate(200);
+    vibrate(200); // 카드 획득 소리는 CardRevealModal이 실제로 카드가 뒤집히는 순간에 재생한다
     setRevealQueue(queue);
     refresh();
   }
