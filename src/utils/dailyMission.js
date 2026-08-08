@@ -11,6 +11,12 @@ const MAX_LABEL_LENGTH = 20;
 const LOG_RETENTION_DAYS = 90;
 const BONUS_MISSION_ID = "__bonus__";
 
+// 하루에 새로 "만들 수 있는" 커스텀 미션 개수 상한(보유 가능한 전체 개수인
+// MAX_CUSTOM=10과는 별개). 이게 없으면 한 자리에서 미션을 계속 지어내
+// 완료하는 식으로 하루 카드 상한(DAILY_CARD_CAP)까지 순식간에 채울 수 있다 —
+// 진짜 새 습관을 도입하는 속도(하루 한두 개)에 맞춘 값이다.
+const MAX_NEW_CUSTOM_PER_DAY = 2;
+
 // 하루에 지급할 수 있는 카드 수 상한(일반 미션 + 보너스 카드 합산). 기본
 // 미션 6개 + 커스텀 몇 개 + 보너스 정도는 상한에 안 걸리게, 그러면서도 커스텀
 // 미션을 계속 추가해 카드를 무한정 파밍하지는 못하게 6(기본)보다 여유 있는
@@ -66,6 +72,12 @@ export function addCustomMission(label, now = new Date()) {
 
   const custom = getCustomMissions();
   if (custom.length >= MAX_CUSTOM) return { ok: false, error: "limit_reached" };
+
+  const today = todayDateString(now);
+  const createdToday = custom.filter(
+    (m) => todayDateString(new Date(m.createdAt)) === today
+  ).length;
+  if (createdToday >= MAX_NEW_CUSTOM_PER_DAY) return { ok: false, error: "daily_limit_reached" };
 
   const mission = {
     id: `custom-${now.getTime()}-${Math.random().toString(36).slice(2, 8)}`,

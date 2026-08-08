@@ -21,6 +21,15 @@ beforeEach(() => {
   localStorage.clear();
 });
 
+// 커스텀 미션은 하루 2개까지만 새로 만들 수 있어서(MAX_NEW_CUSTOM_PER_DAY),
+// count개를 한꺼번에 만들어야 하는 테스트는 여러 날에 걸쳐 순서대로 추가한다.
+function addCustomMissionsAcrossDays(count, startDay) {
+  for (let i = 0; i < count; i++) {
+    const day = new Date(startDay.getTime() + Math.floor(i / 2) * 24 * 3_600_000);
+    addCustomMission(`미션${i}`, day);
+  }
+}
+
 describe("DEFAULT_MISSIONS", () => {
   it("기본 미션 6개가 고정되어 있다", () => {
     expect(DEFAULT_MISSIONS).toHaveLength(6);
@@ -49,10 +58,22 @@ describe("커스텀 미션 관리", () => {
   });
 
   it("10개를 초과하면 거부한다", () => {
-    for (let i = 0; i < 10; i++) addCustomMission(`미션${i}`);
-    const result = addCustomMission("11번째");
+    addCustomMissionsAcrossDays(10, new Date("2026-08-01T09:00:00.000Z"));
+    const result = addCustomMission("11번째", new Date("2026-08-10T09:00:00.000Z"));
     expect(result).toEqual({ ok: false, error: "limit_reached" });
     expect(getCustomMissions()).toHaveLength(10);
+  });
+
+  it("하루에 새 미션은 2개까지만 만들 수 있다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    expect(addCustomMission("A", now).ok).toBe(true);
+    expect(addCustomMission("B", now).ok).toBe(true);
+    const third = addCustomMission("C", now);
+    expect(third).toEqual({ ok: false, error: "daily_limit_reached" });
+    expect(getCustomMissions()).toHaveLength(2);
+
+    const tomorrow = new Date("2026-08-08T09:00:00.000Z");
+    expect(addCustomMission("D", tomorrow).ok).toBe(true); // 다음날엔 다시 가능
   });
 
   it("삭제하면 해당 미션만 제거된다", () => {
@@ -118,10 +139,8 @@ describe("completeMission", () => {
   });
 
   it("하루 카드 지급 상한(DAILY_CARD_CAP)을 넘긴 완료는 cardResult:null이지만 로그는 남는다", () => {
-    const now = new Date("2026-08-07T09:00:00.000Z");
-    for (let i = 0; i < DAILY_CARD_CAP; i++) {
-      addCustomMission(`미션${i}`, now);
-    }
+    addCustomMissionsAcrossDays(DAILY_CARD_CAP, new Date("2026-08-01T09:00:00.000Z"));
+    const now = new Date("2026-08-07T09:00:00.000Z"); // 완료는 전부 이 날 한꺼번에
     const customIds = getCustomMissions().map((m) => m.id);
 
     // 커스텀 미션만으로 이미 상한(DAILY_CARD_CAP)만큼 완료 — 전부 카드 지급됨
@@ -154,11 +173,12 @@ describe("completeBonus", () => {
   });
 
   it("보너스도 같은 하루 카드 상한을 공유한다 — 일반 완료로 상한을 다 썼으면 보너스는 카드 없이 완료만 기록된다", () => {
-    const now = new Date("2026-08-07T09:00:00.000Z");
     // 기본 6개 + 커스텀 (DAILY_CARD_CAP - 6)개 = 상한과 정확히 같은 미션 수를 만든다.
-    for (let i = 0; i < DAILY_CARD_CAP - DEFAULT_MISSIONS.length; i++) {
-      addCustomMission(`커스텀${i}`, now);
-    }
+    addCustomMissionsAcrossDays(
+      DAILY_CARD_CAP - DEFAULT_MISSIONS.length,
+      new Date("2026-08-01T09:00:00.000Z")
+    );
+    const now = new Date("2026-08-07T09:00:00.000Z");
 
     const allIds = getAllMissions().map((m) => m.id);
     expect(allIds).toHaveLength(DAILY_CARD_CAP);
@@ -191,10 +211,10 @@ describe("통계", () => {
   });
 
   it("getCardsAwardedToday는 습관 체크 수가 아니라 실제 카드 지급 수(상한 반영)를 센다", () => {
-    const now = new Date("2026-08-07T09:00:00.000Z");
     // 커스텀 미션은 최대(MAX_CUSTOM=10)까지 채워서, 기본 6개 + 커스텀 10개 =
     // 16개로 DAILY_CARD_CAP(10)보다 확실히 많게 만든다.
-    for (let i = 0; i < 10; i++) addCustomMission(`미션${i}`, now);
+    addCustomMissionsAcrossDays(10, new Date("2026-08-01T09:00:00.000Z"));
+    const now = new Date("2026-08-07T09:00:00.000Z");
     const allIds = getAllMissions().map((m) => m.id);
 
     allIds.forEach((id, i) => completeMission(id, i + 1, () => 0, now));
