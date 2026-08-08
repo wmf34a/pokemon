@@ -66,6 +66,9 @@ export default function CardCollection() {
       <p style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
         {ownedCount} / {all.length}장 수집
       </p>
+      <p style={{ color: "var(--color-text-muted)", fontSize: 11, marginTop: 2 }}>
+        등급은 포켓몬 게임 공식 데이터가 아니라 이 앱만의 수집 등급이에요
+      </p>
 
       <div
         className="no-scrollbar"
