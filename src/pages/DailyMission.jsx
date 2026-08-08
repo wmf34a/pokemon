@@ -119,7 +119,9 @@ export default function DailyMission() {
           <span>
             오늘 완료 {todayCount}/{missions.length}
           </span>
-          <span>오늘 획득 카드 {cardsToday}장</span>
+          <span>
+            오늘 획득 카드 {cardsToday}/{DAILY_CARD_CAP}장
+          </span>
         </div>
         <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>
           이번 주 {weekCount}개 완료 · 매일 자정에 초기화돼요

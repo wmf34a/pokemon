@@ -10,7 +10,7 @@ import {
   clearPendingEvolution,
   EVOLUTION_THRESHOLD,
 } from "../utils/myPokemon";
-import { getCareState, getMoodLevel, MOOD_LABEL_KO, MOOD_FILTER } from "../utils/pokemonCare";
+import { getCareState, getMoodLevel, isAnyActionReady, MOOD_LABEL_KO, MOOD_FILTER } from "../utils/pokemonCare";
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
@@ -36,7 +36,9 @@ export default function Home() {
   );
 
   // "포켓몬 키우기" 상태는 mine이 있을 때만 의미가 있다(돌봄 대상 = currentStageId).
+  // 이제 별도 페이지가 아니라 "내 포켓몬" 카드 안에 함께 보여준다.
   const careMood = useMemo(() => (mine ? getMoodLevel(getCareState()) : null), [mine]);
+  const careReady = useMemo(() => (mine ? isAnyActionReady() : false), [mine]);
 
   // 진화 리빌 연출의 이전/이후 포켓몬. history의 마지막 두 항목을 사용해, 홈 화면을
   // 다시 방문하기 전에 여러 번 진화가 쌓였더라도(퀴즈를 몰아서 푼 경우 등) 마지막
@@ -282,7 +284,11 @@ export default function Home() {
                 <img
                   src={currentPokemon.artwork}
                   alt={mine.nickname}
-                  style={{ width: 52, height: 52 }}
+                  style={{
+                    width: 52,
+                    height: 52,
+                    filter: careMood ? MOOD_FILTER[careMood] : "none",
+                  }}
                 />
               )}
             </div>
@@ -291,6 +297,18 @@ export default function Home() {
               <div style={{ fontFamily: "var(--font-heading)", fontSize: 19 }}>
                 {mine.nickname}
               </div>
+              {careMood && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    marginTop: 2,
+                    fontWeight: careReady ? 700 : 400,
+                    color: careReady ? "var(--color-primary)" : "var(--color-text-muted)",
+                  }}
+                >
+                  {careReady ? "지금 돌봐줄 수 있어요!" : MOOD_LABEL_KO[careMood]}
+                </div>
+              )}
 
               {currentPokemon && currentPokemon.evolvesTo?.length > 0 ? (
                 <div style={{ marginTop: 6 }}>
@@ -353,35 +371,6 @@ export default function Home() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>오늘의 포켓몬</div>
             <div style={{ fontWeight: 700 }}>{dailyPokemon.nameKo}</div>
-          </div>
-        </Link>
-      )}
-
-      {careMood && currentPokemon && (
-        <Link
-          to="/care"
-          className="press pop-card"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-3)",
-            marginTop: "var(--space-3)",
-            padding: "var(--space-3) var(--space-4)",
-            borderRadius: "var(--radius-lg)",
-            background: "var(--color-surface)",
-            boxShadow: "var(--shadow-card)",
-            textDecoration: "none",
-            color: "inherit",
-          }}
-        >
-          <img
-            src={currentPokemon.artwork}
-            alt=""
-            style={{ width: 44, height: 44, filter: MOOD_FILTER[careMood] }}
-          />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>포켓몬 키우기</div>
-            <div style={{ fontWeight: 700 }}>{MOOD_LABEL_KO[careMood]}</div>
           </div>
         </Link>
       )}

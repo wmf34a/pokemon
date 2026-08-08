@@ -34,7 +34,7 @@ describe("QuizHub", () => {
     expect(screen.queryByText("준비중")).not.toBeInTheDocument();
   });
 
-  it("예전 더보기 탭 기능 4개로 가는 링크도 함께 보여준다", () => {
+  it("예전 더보기 탭 기능들로 가는 링크도 함께 보여준다", () => {
     render(
       <MemoryRouter>
         <QuizHub />
@@ -43,7 +43,6 @@ describe("QuizHub", () => {
 
     expect(screen.getByRole("link", { name: /오늘의 포켓몬/ })).toHaveAttribute("href", "/daily");
     expect(screen.getByRole("link", { name: /카드 수집/ })).toHaveAttribute("href", "/collection");
-    expect(screen.getByRole("link", { name: /포켓몬 키우기/ })).toHaveAttribute("href", "/care");
     expect(screen.getByRole("link", { name: /일일 미션/ })).toHaveAttribute("href", "/missions");
   });
 });

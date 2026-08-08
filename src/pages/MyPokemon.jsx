@@ -3,6 +3,87 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { loadPokemonData, TYPE_COLOR } from "../utils/pokemonData";
 import { getMyPokemon, graduateAndRestart, resetMyPokemon } from "../utils/myPokemon";
+import {
+  getCareState,
+  feed,
+  play,
+  sleep,
+  getFeedCooldownMs,
+  getPlayCooldownMs,
+  getSleepCooldownMs,
+  getMoodLevel,
+  MOOD_LABEL_KO,
+  MOOD_FILTER,
+} from "../utils/pokemonCare";
+
+const GRUMPY_TOAST_KEY = "pokemonCare.grumpyToastShown.v1";
+
+function formatCooldown(ms) {
+  const totalMinutes = Math.ceil(ms / 60_000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return `${hours}시간 ${minutes > 0 ? `${minutes}분 ` : ""}후`;
+  return `${minutes}분 후`;
+}
+
+function Gauge({ label, value }) {
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 12,
+          color: "var(--color-text-muted)",
+        }}
+      >
+        <span>{label}</span>
+        <span>{Math.round(value)}</span>
+      </div>
+      <div
+        style={{
+          height: 8,
+          borderRadius: "var(--radius-pill)",
+          background: "var(--color-surface-2)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${value}%`,
+            background: "var(--color-accent)",
+            borderRadius: "var(--radius-pill)",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({ label, cooldownMs, onClick }) {
+  const disabled = cooldownMs > 0;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={disabled ? undefined : "press"}
+      style={{
+        flex: 1,
+        minHeight: 48,
+        borderRadius: "var(--radius-md)",
+        border: "none",
+        background: disabled ? "var(--color-surface-2)" : "var(--color-primary)",
+        color: disabled ? "var(--color-text-muted)" : "var(--color-text-on-primary)",
+        fontWeight: 700,
+        fontSize: 13,
+      }}
+    >
+      {disabled ? `${label} (${formatCooldown(cooldownMs)})` : label}
+    </button>
+  );
+}
 
 export default function MyPokemon() {
   const navigate = useNavigate();
@@ -10,6 +91,8 @@ export default function MyPokemon() {
   const [p, setP] = useState(null);
   const [dismissedGraduation, setDismissedGraduation] = useState(false);
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const [careState, setCareState] = useState(null);
+  const [showGrumpyToast, setShowGrumpyToast] = useState(false);
 
   useEffect(() => {
     const rec = getMyPokemon();
@@ -21,7 +104,31 @@ export default function MyPokemon() {
     loadPokemonData().then((all) => {
       setP(all.find((x) => x.id === rec.currentStageId) || null);
     });
+    setCareState(getCareState());
   }, [navigate]);
+
+  const mood = careState ? getMoodLevel(careState) : null;
+
+  useEffect(() => {
+    if (mood !== "grumpy") return;
+    let alreadyShown;
+    try {
+      alreadyShown = sessionStorage.getItem(GRUMPY_TOAST_KEY);
+    } catch {
+      alreadyShown = null;
+    }
+    if (alreadyShown) return;
+    setShowGrumpyToast(true);
+    try {
+      sessionStorage.setItem(GRUMPY_TOAST_KEY, "1");
+    } catch {
+      // 세션 저장 불가 환경에서는 방문마다 다시 뜨는 정도로 허용
+    }
+  }, [mood]);
+
+  function handleCareAction(actionFn) {
+    setCareState(actionFn());
+  }
 
   if (record === undefined || record === null || !p) {
     return (
@@ -55,12 +162,21 @@ export default function MyPokemon() {
           background: `color-mix(in srgb, ${tint} 18%, var(--color-surface))`,
         }}
       >
-        <img src={p.artwork} alt={record.nickname} style={{ width: 180, height: 180 }} />
+        <img
+          src={p.artwork}
+          alt={record.nickname}
+          style={{ width: 180, height: 180, filter: mood ? MOOD_FILTER[mood] : "none" }}
+        />
         <div style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
           #{String(p.id).padStart(4, "0")}
         </div>
         <h1 style={{ fontSize: 26, marginTop: 2 }}>{record.nickname}</h1>
         <div style={{ color: "var(--color-text-muted)", fontSize: 14 }}>{p.nameKo}</div>
+        {mood && (
+          <div style={{ color: "var(--color-text-muted)", fontSize: 13, marginTop: 6 }}>
+            {MOOD_LABEL_KO[mood]}
+          </div>
+        )}
       </div>
 
       <p
@@ -74,6 +190,63 @@ export default function MyPokemon() {
       >
         퀴즈를 풀면서 함께 키워보세요!
       </p>
+
+      {showGrumpyToast && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "10px 16px",
+            borderRadius: "var(--radius-pill)",
+            border: "1.5px solid var(--color-danger)",
+            background: "color-mix(in srgb, var(--color-danger) 14%, var(--color-surface))",
+            color: "var(--color-text)",
+            fontWeight: 700,
+            fontSize: 13,
+            margin: "var(--space-3) auto 0",
+            maxWidth: 320,
+          }}
+        >
+          {record.nickname}가 삐쳤어요! 돌봐주세요
+        </div>
+      )}
+
+      {careState && (
+        <div
+          style={{
+            marginTop: "var(--space-5)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-4)",
+            background: "var(--color-surface)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <Gauge label="배고픔" value={careState.hunger} />
+          <Gauge label="행복도" value={careState.happiness} />
+          <Gauge label="피로도" value={careState.fatigue} />
+
+          <div style={{ display: "flex", gap: 8, marginTop: "var(--space-4)" }}>
+            <ActionButton
+              label="밥주기"
+              cooldownMs={getFeedCooldownMs()}
+              onClick={() => handleCareAction(feed)}
+            />
+            <ActionButton
+              label="놀아주기"
+              cooldownMs={getPlayCooldownMs()}
+              onClick={() => handleCareAction(play)}
+            />
+            <ActionButton
+              label="재우기"
+              cooldownMs={getSleepCooldownMs()}
+              onClick={() => handleCareAction(sleep)}
+            />
+          </div>
+          <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 8 }}>
+            밥주기·놀아주기는 6시간마다, 재우기는 8시간마다 다시 할 수 있어요
+          </p>
+        </div>
+      )}
 
       {isFinalEvolution && !dismissedGraduation && (
         <div

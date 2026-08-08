@@ -13,7 +13,6 @@ const NAV_ITEMS = [
       p.startsWith("/quiz") ||
       p.startsWith("/daily") ||
       p.startsWith("/collection") ||
-      p.startsWith("/care") ||
       p.startsWith("/missions"),
   },
 ];

@@ -12,7 +12,6 @@ import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
 import DailyPokemon from "./pages/DailyPokemon";
 import CardCollection from "./pages/CardCollection";
-import PokemonCare from "./pages/PokemonCare";
 import DailyMission from "./pages/DailyMission";
 
 export default function App() {
@@ -31,7 +30,6 @@ export default function App() {
       <Route path="/mine" element={<MyPokemon />} />
       <Route path="/daily" element={<DailyPokemon />} />
       <Route path="/collection" element={<CardCollection />} />
-      <Route path="/care" element={<PokemonCare />} />
       <Route path="/missions" element={<DailyMission />} />
     </Routes>
   );

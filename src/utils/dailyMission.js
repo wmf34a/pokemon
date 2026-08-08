@@ -12,11 +12,11 @@ const LOG_RETENTION_DAYS = 90;
 const BONUS_MISSION_ID = "__bonus__";
 
 // 하루에 지급할 수 있는 카드 수 상한(일반 미션 + 보너스 카드 합산). 기본
-// 미션 6개 + 커스텀 몇 개 정도는 상한에 안 걸리게, 그러면서도 커스텀 미션을
-// 계속 추가해 카드를 무한정 파밍하지는 못하게 6(기본)보다 살짝 여유 있는
+// 미션 6개 + 커스텀 몇 개 + 보너스 정도는 상한에 안 걸리게, 그러면서도 커스텀
+// 미션을 계속 추가해 카드를 무한정 파밍하지는 못하게 6(기본)보다 여유 있는
 // 값으로 잡는다. 상한을 넘긴 완료(보너스 포함)는 습관 기록(체크/시간)은
 // 그대로 남지만 카드는 더 지급하지 않는다.
-export const DAILY_CARD_CAP = 8;
+export const DAILY_CARD_CAP = 10;
 
 export const DEFAULT_MISSIONS = [
   { id: "gotoSchool", label: "등원하기" },

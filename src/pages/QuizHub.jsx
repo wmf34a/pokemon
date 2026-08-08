@@ -10,7 +10,6 @@ import {
   SearchIcon,
   CalendarIcon,
   LayersIcon,
-  HeartIcon,
   ClipboardCheckIcon,
 } from "../components/Icons";
 
@@ -22,12 +21,12 @@ const MODES = [
   { key: "zoom", icon: SearchIcon, title: "누구냔 넌", desc: "확대된 일부만 보고 맞히기", to: "/quiz/zoom" },
 ];
 
-// 예전 "더보기" 탭에 있던 4개 기능. 하단 네비를 3탭(홈/도감/퀴즈)으로 줄이면서
-// 이 페이지 하단 섹션으로 옮겨왔다.
+// 예전 "더보기" 탭에 있던 기능들. 하단 네비를 3탭(홈/도감/퀴즈)으로 줄이면서
+// 이 페이지 하단 섹션으로 옮겨왔다. "포켓몬 키우기"는 /mine("내 포켓몬")
+// 페이지로 합쳐져서 여기엔 없다 — 홈 화면 "내 포켓몬" 카드에서 바로 간다.
 const MORE_MODES = [
   { key: "daily", icon: CalendarIcon, title: "오늘의 포켓몬", desc: "매일 새로운 포켓몬을 만나보세요", to: "/daily" },
   { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈를 풀고 카드를 모아보세요", to: "/collection" },
-  { key: "care", icon: HeartIcon, title: "포켓몬 키우기", desc: "매일 돌보며 애착을 키워요", to: "/care" },
   { key: "missions", icon: ClipboardCheckIcon, title: "일일 미션", desc: "오늘의 습관을 완료하고 카드 받기", to: "/missions" },
 ];
 

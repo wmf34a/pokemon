@@ -2,6 +2,10 @@
 // 완전히 별개의 localStorage 레코드로 관리하며, currentStageId만 읽기 전용으로 참조한다.
 // 백그라운드 타이머 없이, 상태를 읽는 시점(getCareState)에 lastTickAt부터 지금까지
 // 경과한 시간만큼 순수 함수로 깎아 계산한다.
+//
+// 액션(밥주기/놀아주기/재우기)은 "하루 1번"이 아니라 각자 쿨다운 시간이 지나면
+// 다시 할 수 있다 — 재방문을 유도하려면 캘린더 날짜가 아니라 실제 경과 시간
+// 기준으로 다시 열려야 하기 때문. 쿨다운 동안은 버튼에 남은 시간을 보여준다.
 
 const KEY = "pokemonCare.v1";
 
@@ -9,15 +13,14 @@ const HOURLY_HUNGER_DECAY = 2;
 const HOURLY_HAPPINESS_DECAY = 1;
 const HOURLY_FATIGUE_GROWTH = 1;
 
+const COOLDOWN_HOURS = {
+  feed: 6,
+  play: 6,
+  sleep: 8,
+};
+
 function clamp(n) {
   return Math.max(0, Math.min(100, Math.round(n)));
-}
-
-function todayDateString(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }
 
 function readRecord() {
@@ -45,9 +48,9 @@ function defaultRecord(now) {
     hunger: 80,
     happiness: 80,
     fatigue: 20,
-    lastFedDate: null,
-    lastPlayedDate: null,
-    lastSleptDate: null,
+    lastFedAt: null,
+    lastPlayedAt: null,
+    lastSleptAt: null,
     lastTickAt: now.toISOString(),
   };
 }
@@ -70,24 +73,32 @@ export function getCareState(now = new Date()) {
   return writeRecord(applyDecay(base, now));
 }
 
-function runActionOncePerDay(dateField, now, apply) {
-  const state = getCareState(now);
-  if (state[dateField] === todayDateString(now)) return state; // 오늘 이미 함
-  return writeRecord({ ...apply(state), [dateField]: todayDateString(now) });
+// lastAt이 없으면(한 번도 안 했으면) 쿨다운 없음(0). 있으면 쿨다운 종료까지 남은
+// 밀리초, 이미 지났으면 0.
+function remainingCooldownMs(lastAt, cooldownHours, now) {
+  if (!lastAt) return 0;
+  const elapsed = now.getTime() - new Date(lastAt).getTime();
+  return Math.max(0, cooldownHours * 3_600_000 - elapsed);
 }
 
-// 배고픔 하락(시간당 -2, 하루 -48)이 놀기/재우기보다 빨라, 하루 1번 밥주기로도
-// 순감소 없이 유지되려면 +30으로는 부족하다(하루 -18 순감소, 결국 항상 0으로
-// 수렴). +50으로 올려 하루 1번 챙기면 배고픔이 오히려 살짝 오르게 맞춘다.
+function runActionIfReady(field, cooldownHours, now, apply) {
+  const state = getCareState(now);
+  if (remainingCooldownMs(state[field], cooldownHours, now) > 0) return state; // 아직 쿨다운 중
+  return writeRecord({ ...apply(state), [field]: now.toISOString() });
+}
+
+// 배고픔 하락(시간당 -2)이 다른 지표보다 빨라, 쿨다운 한 번(6시간, -12) 챙길
+// 때마다 순감소 없이 유지되려면 +30으로는 부족하다. +50으로 올려 6시간마다
+// 한 번씩만 챙겨도(하루 최소 1번 이상) 배고픔이 유지/상승하게 맞춘다.
 export function feed(now = new Date()) {
-  return runActionOncePerDay("lastFedDate", now, (state) => ({
+  return runActionIfReady("lastFedAt", COOLDOWN_HOURS.feed, now, (state) => ({
     ...state,
     hunger: clamp(state.hunger + 50),
   }));
 }
 
 export function play(now = new Date()) {
-  return runActionOncePerDay("lastPlayedDate", now, (state) => ({
+  return runActionIfReady("lastPlayedAt", COOLDOWN_HOURS.play, now, (state) => ({
     ...state,
     happiness: clamp(state.happiness + 25),
     fatigue: clamp(state.fatigue + 15),
@@ -95,22 +106,41 @@ export function play(now = new Date()) {
 }
 
 export function sleep(now = new Date()) {
-  return runActionOncePerDay("lastSleptDate", now, (state) => ({
+  return runActionIfReady("lastSleptAt", COOLDOWN_HOURS.sleep, now, (state) => ({
     ...state,
     fatigue: clamp(state.fatigue - 40),
   }));
 }
 
-export function canFeedToday(now = new Date()) {
-  return getCareState(now).lastFedDate !== todayDateString(now);
+export function canFeed(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastFedAt, COOLDOWN_HOURS.feed, now) === 0;
 }
 
-export function canPlayToday(now = new Date()) {
-  return getCareState(now).lastPlayedDate !== todayDateString(now);
+export function canPlay(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastPlayedAt, COOLDOWN_HOURS.play, now) === 0;
 }
 
-export function canSleepToday(now = new Date()) {
-  return getCareState(now).lastSleptDate !== todayDateString(now);
+export function canSleep(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastSleptAt, COOLDOWN_HOURS.sleep, now) === 0;
+}
+
+// 버튼에 "N시간 후" 식으로 보여줄 남은 쿨다운(ms). 0이면 지금 바로 가능.
+export function getFeedCooldownMs(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastFedAt, COOLDOWN_HOURS.feed, now);
+}
+
+export function getPlayCooldownMs(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastPlayedAt, COOLDOWN_HOURS.play, now);
+}
+
+export function getSleepCooldownMs(now = new Date()) {
+  return remainingCooldownMs(getCareState(now).lastSleptAt, COOLDOWN_HOURS.sleep, now);
+}
+
+// 밥/놀기/재우기 중 하나라도 지금 가능하면 true — 홈 화면 카드가 "지금
+// 돌봐줄 수 있어요" 배지를 보여줄지 판단하는 데 쓴다.
+export function isAnyActionReady(now = new Date()) {
+  return canFeed(now) || canPlay(now) || canSleep(now);
 }
 
 export const MOOD_LABEL_KO = {

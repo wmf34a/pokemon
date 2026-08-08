@@ -4,9 +4,12 @@ import {
   feed,
   play,
   sleep,
-  canFeedToday,
-  canPlayToday,
-  canSleepToday,
+  canFeed,
+  canPlay,
+  canSleep,
+  getFeedCooldownMs,
+  getSleepCooldownMs,
+  isAnyActionReady,
   getMoodLevel,
 } from "./pokemonCare";
 
@@ -51,7 +54,7 @@ describe("getCareState", () => {
   });
 });
 
-describe("액션 (1일 1회 제한)", () => {
+describe("액션 (쿨다운 기반)", () => {
   it("feed()는 배고픔을 50 올리고, 같은 시각(같은 날) 두 번째 호출은 추가로 올리지 않는다", () => {
     const start = new Date("2026-08-07T09:00:00.000Z");
     getCareState(start);
@@ -92,24 +95,53 @@ describe("액션 (1일 1회 제한)", () => {
     expect(result.fatigue).toBe(0); // clamp(20-40)
   });
 
-  it("canFeedToday/canPlayToday/canSleepToday는 오늘 이미 했으면 false를 반환한다", () => {
+  it("canFeed/canPlay/canSleep은 방금 했으면 false, 다른 액션은 영향받지 않는다", () => {
     const now = new Date("2026-08-07T09:00:00.000Z");
     getCareState(now);
-    expect(canFeedToday(now)).toBe(true);
+    expect(canFeed(now)).toBe(true);
     feed(now);
-    expect(canFeedToday(now)).toBe(false);
-    expect(canPlayToday(now)).toBe(true);
-    expect(canSleepToday(now)).toBe(true);
+    expect(canFeed(now)).toBe(false);
+    expect(canPlay(now)).toBe(true);
+    expect(canSleep(now)).toBe(true);
   });
 
-  it("날짜가 바뀌면 다시 액션을 할 수 있다", () => {
-    const day1 = new Date("2026-08-07T09:00:00.000Z");
-    getCareState(day1);
-    feed(day1);
-    expect(canFeedToday(day1)).toBe(false);
+  it("쿨다운(밥주기 6시간)이 지나면 다시 할 수 있다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(now);
+    feed(now);
+    expect(canFeed(new Date(now.getTime() + 5 * 3_600_000))).toBe(false); // 5시간 후 — 아직
+    expect(canFeed(new Date(now.getTime() + 6 * 3_600_000))).toBe(true); // 6시간 후 — 가능
+  });
 
-    const day2 = new Date("2026-08-08T09:00:00.000Z");
-    expect(canFeedToday(day2)).toBe(true);
+  it("getFeedCooldownMs는 남은 시간을 밀리초로 반환하고, 쿨다운이 끝나면 0이다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(now);
+    feed(now);
+    const oneHourLater = new Date(now.getTime() + 3_600_000);
+    expect(getFeedCooldownMs(oneHourLater)).toBe(5 * 3_600_000); // 6시간 중 1시간 지남
+    const afterCooldown = new Date(now.getTime() + 6 * 3_600_000);
+    expect(getFeedCooldownMs(afterCooldown)).toBe(0);
+  });
+
+  it("재우기 쿨다운은 8시간이다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(now);
+    sleep(now);
+    expect(getSleepCooldownMs(new Date(now.getTime() + 7 * 3_600_000))).toBeGreaterThan(0);
+    expect(getSleepCooldownMs(new Date(now.getTime() + 8 * 3_600_000))).toBe(0);
+  });
+
+  it("isAnyActionReady는 밥/놀기/재우기 중 하나라도 가능하면 true다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(now);
+    expect(isAnyActionReady(now)).toBe(true); // 아무 것도 안 한 상태
+
+    feed(now);
+    play(now);
+    sleep(now);
+    expect(isAnyActionReady(now)).toBe(false); // 셋 다 방금 함 — 전부 쿨다운 중
+
+    expect(isAnyActionReady(new Date(now.getTime() + 6 * 3_600_000))).toBe(true); // 밥/놀기 쿨다운 끝
   });
 });
 
