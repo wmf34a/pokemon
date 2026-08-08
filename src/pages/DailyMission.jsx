@@ -132,12 +132,23 @@ export default function DailyMission() {
         <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>
           이번 주 {weekCount}개 완료 · 매일 자정에 초기화돼요
         </div>
-        <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 6, lineHeight: 1.6 }}>
-          기본 미션은 {DEFAULT_MISSIONS.length}개입니다. 커스텀 미션은 최대 {MAX_CUSTOM}개까지 추가할
-          수 있어요(하루 {MAX_NEW_CUSTOM_PER_DAY}개씩). 미션을 완료하면 카드를 1장씩 받고, 전체
-          미션을 다 완료하면 보너스 카드 1장을 더 받아요. 단, 하루에 획득 가능한 카드는 총{" "}
-          {DAILY_CARD_CAP}장입니다.
-        </div>
+        <ul
+          style={{
+            fontSize: 11,
+            color: "var(--color-text-muted)",
+            marginTop: 6,
+            lineHeight: 1.7,
+            paddingLeft: 16,
+          }}
+        >
+          <li>기본 미션은 {DEFAULT_MISSIONS.length}개예요.</li>
+          <li>
+            커스텀 미션은 최대 {MAX_CUSTOM}개까지 만들 수 있어요. (하루에 새로 추가할 수 있는
+            건 {MAX_NEW_CUSTOM_PER_DAY}개까지예요 — 그래서 10개를 다 채우려면 며칠 걸려요.)
+          </li>
+          <li>미션 하나 완료하면 카드 1장, 전체 완료하면 보너스 카드 1장이 더 나와요.</li>
+          <li>단, 하루에 받을 수 있는 카드는 최대 {DAILY_CARD_CAP}장이에요.</li>
+        </ul>
         {capReached && (
           <div style={{ fontSize: 12, color: "var(--color-danger)", marginTop: 4 }}>
             오늘 카드 지급 한도({DAILY_CARD_CAP}장)에 도달했어요 — 미션 체크는 계속 기록돼요
