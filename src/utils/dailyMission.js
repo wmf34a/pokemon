@@ -76,8 +76,14 @@ export function addCustomMission(label, now = new Date()) {
   return { ok: true, mission };
 }
 
-export function removeCustomMission(id) {
+// 오늘 이미 완료한 커스텀 미션은 삭제할 수 없다 — 허용하면 삭제 후 같은
+// 이름으로 다시 등록해 새 id로 오늘 몫을 또 완료하는 식으로 카드 지급/완료
+// 횟수를 무한정 파밍할 수 있게 된다(완료 기록은 id별로 남기 때문에 새
+// id는 "오늘 안 한 미션" 취급됨). 완료된 미션은 다음날부터 삭제 가능하다.
+export function removeCustomMission(id, now = new Date()) {
+  if (isMissionCompletedToday(id, now)) return false;
   writeJSON(CUSTOM_KEY, getCustomMissions().filter((m) => m.id !== id));
+  return true;
 }
 
 export function getAllMissions() {

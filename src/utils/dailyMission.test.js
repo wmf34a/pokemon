@@ -62,6 +62,21 @@ describe("커스텀 미션 관리", () => {
     expect(getCustomMissions().map((m) => m.label)).toEqual(["A"]);
   });
 
+  it("오늘 이미 완료한 커스텀 미션은 삭제할 수 없다(삭제 후 재등록으로 재완료하는 파밍 방지)", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    const { mission } = addCustomMission("숙제하기", now);
+    completeMission(mission.id, 1, () => 0, now);
+
+    const removed = removeCustomMission(mission.id, now);
+    expect(removed).toBe(false);
+    expect(getCustomMissions()).toHaveLength(1); // 그대로 남아있음
+
+    // 다음날에는 삭제할 수 있다
+    const tomorrow = new Date("2026-08-08T09:00:00.000Z");
+    expect(removeCustomMission(mission.id, tomorrow)).toBe(true);
+    expect(getCustomMissions()).toHaveLength(0);
+  });
+
   it("getAllMissions는 기본 미션 뒤에 커스텀 미션을 이어붙인다", () => {
     addCustomMission("숙제하기");
     const all = getAllMissions();

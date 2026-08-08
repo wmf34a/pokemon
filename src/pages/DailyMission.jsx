@@ -227,27 +227,36 @@ export default function DailyMission() {
           <p style={{ color: "var(--color-danger)", fontSize: 12, marginTop: 4 }}>{customError}</p>
         )}
 
-        {customMissions.map((m) => (
-          <div
-            key={m.id}
-            style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 13 }}
-          >
-            <span style={{ flex: 1 }}>{m.label}</span>
-            <button
-              type="button"
-              onClick={() => handleRemoveCustom(m.id)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--color-text-muted)",
-                fontSize: 12,
-                textDecoration: "underline",
-              }}
+        {customMissions.map((m) => {
+          const doneToday = missions.find((x) => x.id === m.id)?.completedToday;
+          return (
+            <div
+              key={m.id}
+              style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 13 }}
             >
-              삭제
-            </button>
-          </div>
-        ))}
+              <span style={{ flex: 1 }}>{m.label}</span>
+              {doneToday ? (
+                <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+                  오늘 완료됨 · 내일부터 삭제 가능
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveCustom(m.id)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--color-text-muted)",
+                    fontSize: 12,
+                    textDecoration: "underline",
+                  }}
+                >
+                  삭제
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <ConfirmDialog
