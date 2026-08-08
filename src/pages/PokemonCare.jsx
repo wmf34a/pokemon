@@ -13,16 +13,10 @@ import {
   canSleepToday,
   getMoodLevel,
   MOOD_LABEL_KO,
+  MOOD_FILTER,
 } from "../utils/pokemonCare";
 
 const GRUMPY_TOAST_KEY = "pokemonCare.grumpyToastShown.v1";
-
-const MOOD_FILTER = {
-  happy: "none",
-  normal: "saturate(0.9)",
-  tired: "saturate(0.6) brightness(0.9)",
-  grumpy: "saturate(0.4) brightness(0.8)",
-};
 
 function Gauge({ label, value }) {
   return (

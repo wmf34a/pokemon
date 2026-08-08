@@ -10,6 +10,7 @@ import {
   clearPendingEvolution,
   EVOLUTION_THRESHOLD,
 } from "../utils/myPokemon";
+import { getCareState, getMoodLevel, MOOD_LABEL_KO, MOOD_FILTER } from "../utils/pokemonCare";
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
@@ -33,6 +34,9 @@ export default function Home() {
     () => (mine ? all.find((p) => p.id === mine.currentStageId) : null),
     [mine, all]
   );
+
+  // "포켓몬 키우기" 상태는 mine이 있을 때만 의미가 있다(돌봄 대상 = currentStageId).
+  const careMood = useMemo(() => (mine ? getMoodLevel(getCareState()) : null), [mine]);
 
   // 진화 리빌 연출의 이전/이후 포켓몬. history의 마지막 두 항목을 사용해, 홈 화면을
   // 다시 방문하기 전에 여러 번 진화가 쌓였더라도(퀴즈를 몰아서 푼 경우 등) 마지막
@@ -349,6 +353,35 @@ export default function Home() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>오늘의 포켓몬</div>
             <div style={{ fontWeight: 700 }}>{dailyPokemon.nameKo}</div>
+          </div>
+        </Link>
+      )}
+
+      {careMood && currentPokemon && (
+        <Link
+          to="/care"
+          className="press pop-card"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            marginTop: "var(--space-3)",
+            padding: "var(--space-3) var(--space-4)",
+            borderRadius: "var(--radius-lg)",
+            background: "var(--color-surface)",
+            boxShadow: "var(--shadow-card)",
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
+          <img
+            src={currentPokemon.artwork}
+            alt=""
+            style={{ width: 44, height: 44, filter: MOOD_FILTER[careMood] }}
+          />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>포켓몬 키우기</div>
+            <div style={{ fontWeight: 700 }}>{MOOD_LABEL_KO[careMood]}</div>
           </div>
         </Link>
       )}

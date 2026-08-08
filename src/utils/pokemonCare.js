@@ -117,6 +117,14 @@ export const MOOD_LABEL_KO = {
   grumpy: "삐쳤어요",
 };
 
+// 홈 화면 요약 카드와 /care 페이지가 함께 쓰는 표정 CSS 필터.
+export const MOOD_FILTER = {
+  happy: "none",
+  normal: "saturate(0.9)",
+  tired: "saturate(0.6) brightness(0.9)",
+  grumpy: "saturate(0.4) brightness(0.8)",
+};
+
 export function getMoodLevel(state) {
   const score = (state.hunger + state.happiness + (100 - state.fatigue)) / 3;
   if (score >= 70) return "happy";
