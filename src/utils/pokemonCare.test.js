@@ -52,13 +52,29 @@ describe("getCareState", () => {
 });
 
 describe("액션 (1일 1회 제한)", () => {
-  it("feed()는 배고픔을 30 올리고, 같은 시각(같은 날) 두 번째 호출은 추가로 올리지 않는다", () => {
-    const now = new Date("2026-08-07T09:00:00.000Z");
+  it("feed()는 배고픔을 50 올리고, 같은 시각(같은 날) 두 번째 호출은 추가로 올리지 않는다", () => {
+    const start = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(start);
+    // 클램프에 걸리지 않게 20시간 지나 배고픔을 40까지 내린 뒤 확인한다
+    // (80에서 바로 먹이면 30이든 50이든 100으로 클램프되어 보너스 값을 구분 못 함).
+    const later = new Date("2026-08-08T05:00:00.000Z");
+    const decayed = getCareState(later);
+    expect(decayed.hunger).toBe(40); // 80 - 20*2
+    const first = feed(later);
+    expect(first.hunger).toBe(90); // clamp(40+50)
+    const second = feed(later);
+    expect(second.hunger).toBe(90); // 오늘 두 번째 호출은 무시
+  });
+
+  it("하루 1번씩 밥주기를 반복해도 배고픔이 0으로 수렴하지 않는다(순감소 없음)", () => {
+    let now = new Date("2026-08-07T09:00:00.000Z");
     getCareState(now);
-    const first = feed(now);
-    expect(first.hunger).toBe(100); // clamp(80+30)
-    const second = feed(now);
-    expect(second.hunger).toBe(100); // 오늘 두 번째 호출은 무시
+    let last;
+    for (let day = 0; day < 5; day++) {
+      now = new Date(now.getTime() + 24 * 3_600_000);
+      last = feed(now);
+    }
+    expect(last.hunger).toBeGreaterThanOrEqual(80); // 5일 연속 하루 1번씩 챙겨도 초기값 이상 유지
   });
 
   it("play()는 행복 +25, 피로 +15를 적용한다", () => {

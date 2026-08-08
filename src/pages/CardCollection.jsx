@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AppShell from "../components/AppShell";
 import TypeBadge from "../components/TypeBadge";
 import { loadPokemonData } from "../utils/pokemonData";
-import { getCards, GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
+import { getCards, GRADES, GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
 
 function formatAbility(slug) {
   return slug
@@ -11,10 +11,32 @@ function formatAbility(slug) {
     .join(" ");
 }
 
+// null = 전체, "owned" = 보유만, 그 외에는 GRADES 값 중 하나(해당 등급만)
+const FILTERS = [
+  { value: null, label: "전체" },
+  { value: "owned", label: "보유만" },
+  ...GRADES.map((g) => ({ value: g, label: GRADE_LABEL_KO[g] })),
+];
+
+function pillStyle(active) {
+  return {
+    flexShrink: 0,
+    padding: "8px 16px",
+    minHeight: 36,
+    borderRadius: "var(--radius-pill)",
+    border: active ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
+    background: active ? "var(--color-primary)" : "var(--color-surface)",
+    color: active ? "var(--color-text-on-primary)" : "var(--color-text)",
+    fontSize: 13,
+    fontWeight: 600,
+  };
+}
+
 export default function CardCollection() {
   const [all, setAll] = useState([]);
   const [cards, setCards] = useState({});
   const [flippedId, setFlippedId] = useState(null);
+  const [filter, setFilter] = useState(null);
 
   useEffect(() => {
     loadPokemonData().then(setAll);
@@ -28,11 +50,39 @@ export default function CardCollection() {
 
   const ownedCount = Object.keys(cards).length;
 
+  const filtered = useMemo(
+    () =>
+      all.filter((p) => {
+        const card = cards[p.id];
+        if (filter === null) return true;
+        if (filter === "owned") return Boolean(card);
+        return card?.grade === filter;
+      }),
+    [all, cards, filter]
+  );
+
   return (
-    <AppShell title="카드 수집" backTo="/more">
+    <AppShell title="카드 수집" backTo="/quiz">
       <p style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
         {ownedCount} / {all.length}장 수집
       </p>
+
+      <div
+        className="no-scrollbar"
+        style={{ display: "flex", gap: 6, marginTop: "var(--space-3)", overflowX: "auto" }}
+      >
+        {FILTERS.map(({ value, label }) => (
+          <button key={label} onClick={() => setFilter(value)} style={pillStyle(filter === value)}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <p style={{ textAlign: "center", color: "var(--color-text-muted)", marginTop: 40 }}>
+          조건에 맞는 카드가 없어요.
+        </p>
+      )}
 
       <div
         style={{
@@ -42,7 +92,7 @@ export default function CardCollection() {
           marginTop: "var(--space-3)",
         }}
       >
-        {all.map((p) => {
+        {filtered.map((p) => {
           const card = cards[p.id];
           const isFlipped = flippedId === p.id;
           const color = card ? GRADE_COLOR_VAR[card.grade] : "var(--color-border)";

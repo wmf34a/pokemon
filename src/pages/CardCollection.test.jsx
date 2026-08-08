@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import CardCollection from "./CardCollection";
 import { loadPokemonData } from "../utils/pokemonData";
@@ -43,8 +43,9 @@ describe("CardCollection", () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText("이상해씨")).toBeInTheDocument();
-    expect(screen.getByText("일반")).toBeInTheDocument();
+    const card = await screen.findByRole("button", { name: "이상해씨 카드" });
+    expect(within(card).getByText("이상해씨")).toBeInTheDocument();
+    expect(within(card).getByText("일반")).toBeInTheDocument();
     expect(screen.getByText("???")).toBeInTheDocument();
     expect(screen.queryByText("피카츄")).not.toBeInTheDocument();
   });
@@ -75,5 +76,57 @@ describe("CardCollection", () => {
     const card = await screen.findByRole("button", { name: "이상해씨 카드" });
     fireEvent.click(card);
     expect(screen.getByText("설명입니다.")).toBeInTheDocument();
+  });
+
+  it("'보유만' 필터를 누르면 미보유 카드(물음표)가 사라진다", async () => {
+    awardCard(1, () => 0); // 이상해씨만 획득
+    loadPokemonData.mockResolvedValue([bulbasaur, pikachu]);
+
+    render(
+      <MemoryRouter>
+        <CardCollection />
+      </MemoryRouter>
+    );
+
+    await screen.findByRole("button", { name: "이상해씨 카드" });
+    expect(screen.getByText("???")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "보유만" }));
+
+    expect(screen.queryByText("???")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "이상해씨 카드" })).toBeInTheDocument();
+  });
+
+  it("등급 필터를 누르면 해당 등급 카드만 남는다", async () => {
+    awardCard(1, () => 0); // common
+    awardCard(25, () => 0.9); // rare
+    loadPokemonData.mockResolvedValue([bulbasaur, pikachu]);
+
+    render(
+      <MemoryRouter>
+        <CardCollection />
+      </MemoryRouter>
+    );
+
+    await screen.findByRole("button", { name: "이상해씨 카드" });
+    fireEvent.click(screen.getByRole("button", { name: "레어" }));
+
+    expect(screen.getByRole("button", { name: "피카츄 카드" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "이상해씨 카드" })).not.toBeInTheDocument();
+  });
+
+  it("조건에 맞는 카드가 없으면 안내 문구를 보여준다", async () => {
+    loadPokemonData.mockResolvedValue([bulbasaur, pikachu]); // 아무 것도 획득 안 함
+
+    render(
+      <MemoryRouter>
+        <CardCollection />
+      </MemoryRouter>
+    );
+
+    await screen.findByText("0 / 2장 수집");
+    fireEvent.click(screen.getByRole("button", { name: "초희귀" }));
+
+    expect(screen.getByText("조건에 맞는 카드가 없어요.")).toBeInTheDocument();
   });
 });

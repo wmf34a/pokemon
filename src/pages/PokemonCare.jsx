@@ -113,7 +113,7 @@ export default function PokemonCare() {
 
   if (mine === undefined) {
     return (
-      <AppShell title="포켓몬 키우기" backTo="/more">
+      <AppShell title="포켓몬 키우기" backTo="/quiz">
         <div className="skeleton" style={{ height: 260 }} />
       </AppShell>
     );
@@ -121,7 +121,7 @@ export default function PokemonCare() {
 
   if (!mine) {
     return (
-      <AppShell title="포켓몬 키우기" backTo="/more">
+      <AppShell title="포켓몬 키우기" backTo="/quiz">
         <p style={{ color: "var(--color-text-muted)", marginTop: "var(--space-4)" }}>
           아직 내 포켓몬이 없어요. 먼저 포켓몬을 골라주세요.
         </p>
@@ -150,7 +150,7 @@ export default function PokemonCare() {
   }
 
   return (
-    <AppShell title="포켓몬 키우기" backTo="/more">
+    <AppShell title="포켓몬 키우기" backTo="/quiz">
       <div style={{ textAlign: "center" }}>
         {pokemon && (
           <img

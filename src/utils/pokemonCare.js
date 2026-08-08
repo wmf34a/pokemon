@@ -76,10 +76,13 @@ function runActionOncePerDay(dateField, now, apply) {
   return writeRecord({ ...apply(state), [dateField]: todayDateString(now) });
 }
 
+// 배고픔 하락(시간당 -2, 하루 -48)이 놀기/재우기보다 빨라, 하루 1번 밥주기로도
+// 순감소 없이 유지되려면 +30으로는 부족하다(하루 -18 순감소, 결국 항상 0으로
+// 수렴). +50으로 올려 하루 1번 챙기면 배고픔이 오히려 살짝 오르게 맞춘다.
 export function feed(now = new Date()) {
   return runActionOncePerDay("lastFedDate", now, (state) => ({
     ...state,
-    hunger: clamp(state.hunger + 30),
+    hunger: clamp(state.hunger + 50),
   }));
 }
 

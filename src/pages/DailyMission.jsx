@@ -100,7 +100,7 @@ export default function DailyMission() {
   const activeReveal = revealQueue[0] || null;
 
   return (
-    <AppShell title="일일 미션" backTo="/more">
+    <AppShell title="일일 미션" backTo="/quiz">
       <div
         style={{
           padding: "var(--space-3) var(--space-4)",

@@ -1,17 +1,16 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { ChevronLeftIcon, HomeIcon, BookIcon, GamepadIcon, GridIcon } from "./Icons";
+import { ChevronLeftIcon, HomeIcon, BookIcon, GamepadIcon } from "./Icons";
 import InstallBanner from "./InstallBanner";
 
 const NAV_ITEMS = [
   { to: "/", label: "홈", icon: HomeIcon, match: (p) => p === "/" },
   { to: "/dex", label: "도감", icon: BookIcon, match: (p) => p.startsWith("/dex") || p.startsWith("/pokemon") },
-  { to: "/quiz", label: "퀴즈", icon: GamepadIcon, match: (p) => p.startsWith("/quiz") },
   {
-    to: "/more",
-    label: "더보기",
-    icon: GridIcon,
+    to: "/quiz",
+    label: "퀴즈",
+    icon: GamepadIcon,
     match: (p) =>
-      p.startsWith("/more") ||
+      p.startsWith("/quiz") ||
       p.startsWith("/daily") ||
       p.startsWith("/collection") ||
       p.startsWith("/care") ||

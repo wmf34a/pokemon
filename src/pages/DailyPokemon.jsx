@@ -8,7 +8,7 @@ export default function DailyPokemon() {
 
   if (pokemon === undefined) {
     return (
-      <AppShell title="오늘의 포켓몬" backTo="/more">
+      <AppShell title="오늘의 포켓몬" backTo="/quiz">
         <div className="skeleton" style={{ height: 260 }} />
       </AppShell>
     );
@@ -16,7 +16,7 @@ export default function DailyPokemon() {
 
   if (!pokemon) {
     return (
-      <AppShell title="오늘의 포켓몬" backTo="/more">
+      <AppShell title="오늘의 포켓몬" backTo="/quiz">
         <p style={{ color: "var(--color-text-muted)", marginTop: "var(--space-4)" }}>
           포켓몬 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
         </p>
@@ -25,7 +25,7 @@ export default function DailyPokemon() {
   }
 
   return (
-    <AppShell title="오늘의 포켓몬" backTo="/more">
+    <AppShell title="오늘의 포켓몬" backTo="/quiz">
       <div style={{ textAlign: "center", padding: "var(--space-4) 0" }}>
         <img
           src={pokemon.artwork}

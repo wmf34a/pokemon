@@ -8,15 +8,69 @@ import {
   SwordsIcon,
   ShuffleIcon,
   SearchIcon,
+  CalendarIcon,
+  LayersIcon,
+  HeartIcon,
+  ClipboardCheckIcon,
 } from "../components/Icons";
 
 const MODES = [
-  { key: "silhouette", icon: GlassesIcon, title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", ready: true },
-  { key: "cry", icon: VolumeIcon, title: "울음소리 퀴즈", desc: "소리만 듣고 맞히기", ready: true },
-  { key: "type", icon: SwordsIcon, title: "타입 퀴즈", desc: "제시된 타입을 가진 포켓몬 고르기", ready: true },
-  { key: "evolution", icon: ShuffleIcon, title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", ready: true },
-  { key: "zoom", icon: SearchIcon, title: "누구냔 넌", desc: "확대된 일부만 보고 맞히기", ready: true },
+  { key: "silhouette", icon: GlassesIcon, title: "실루엣 퀴즈", desc: "그림자만 보고 포켓몬 맞히기", to: "/quiz/silhouette" },
+  { key: "cry", icon: VolumeIcon, title: "울음소리 퀴즈", desc: "소리만 듣고 맞히기", to: "/quiz/cry" },
+  { key: "type", icon: SwordsIcon, title: "타입 퀴즈", desc: "제시된 타입을 가진 포켓몬 고르기", to: "/quiz/type" },
+  { key: "evolution", icon: ShuffleIcon, title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", to: "/quiz/evolution" },
+  { key: "zoom", icon: SearchIcon, title: "누구냔 넌", desc: "확대된 일부만 보고 맞히기", to: "/quiz/zoom" },
 ];
+
+// 예전 "더보기" 탭에 있던 4개 기능. 하단 네비를 3탭(홈/도감/퀴즈)으로 줄이면서
+// 이 페이지 하단 섹션으로 옮겨왔다.
+const MORE_MODES = [
+  { key: "daily", icon: CalendarIcon, title: "오늘의 포켓몬", desc: "매일 새로운 포켓몬을 만나보세요", to: "/daily" },
+  { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈를 풀고 카드를 모아보세요", to: "/collection" },
+  { key: "care", icon: HeartIcon, title: "포켓몬 키우기", desc: "매일 돌보며 애착을 키워요", to: "/care" },
+  { key: "missions", icon: ClipboardCheckIcon, title: "일일 미션", desc: "오늘의 습관을 완료하고 카드 받기", to: "/missions" },
+];
+
+function ModeGrid({ modes }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
+      {modes.map(({ key, icon: Icon, title, desc, to }) => (
+        <Link
+          key={key}
+          to={to}
+          className="press"
+          style={{
+            padding: "var(--space-4)",
+            minHeight: 130,
+            borderRadius: "var(--radius-lg)",
+            border: "1px solid var(--color-border)",
+            textDecoration: "none",
+            color: "var(--color-text)",
+            background: "var(--color-surface)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              background: "color-mix(in srgb, var(--color-accent) 30%, transparent)",
+              color: "var(--color-accent-ink)",
+            }}
+          >
+            <Icon size={20} />
+          </div>
+          <div style={{ fontWeight: 700, marginTop: 8 }}>{title}</div>
+          <div style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{desc}</div>
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export default function QuizHub() {
   const [gen1Only, setGen1Only] = useState(() => getGen1OnlyPref());
@@ -100,54 +154,20 @@ export default function QuizHub() {
         </span>
       </label>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
-        {MODES.map(({ key, icon: Icon, title, desc, ready }) => (
-          <Link
-            key={key}
-            to={ready ? `/quiz/${key}` : "#"}
-            onClick={(e) => !ready && e.preventDefault()}
-            aria-disabled={!ready}
-            tabIndex={ready ? 0 : -1}
-            className={ready ? "press" : undefined}
-            style={{
-              padding: "var(--space-4)",
-              minHeight: 130,
-              borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--color-border)",
-              textDecoration: "none",
-              color: "var(--color-text)",
-              background: ready ? "var(--color-surface)" : "var(--color-surface-2)",
-              boxShadow: ready ? "var(--shadow-card)" : "none",
-              opacity: ready ? 1 : 0.6,
-              cursor: ready ? "pointer" : "default",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: ready
-                  ? "color-mix(in srgb, var(--color-accent) 30%, transparent)"
-                  : "var(--color-border)",
-                color: ready ? "var(--color-accent-ink)" : "var(--color-text-muted)",
-              }}
-            >
-              <Icon size={20} />
-            </div>
-            <div style={{ fontWeight: 700, marginTop: 8 }}>{title}</div>
-            <div style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{desc}</div>
-            {!ready && (
-              <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 6 }}>
-                준비중
-              </div>
-            )}
-          </Link>
-        ))}
-      </div>
+      <ModeGrid modes={MODES} />
+
+      <h2
+        style={{
+          fontSize: 16,
+          fontFamily: "var(--font-heading)",
+          fontWeight: 400,
+          marginTop: "var(--space-6)",
+          marginBottom: "var(--space-3)",
+        }}
+      >
+        더 즐기기
+      </h2>
+      <ModeGrid modes={MORE_MODES} />
     </AppShell>
   );
 }
