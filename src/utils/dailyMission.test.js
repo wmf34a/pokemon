@@ -12,7 +12,9 @@ import {
   completeBonus,
   getTodayCompletedCount,
   getWeeklyCompletedCount,
+  getCardsAwardedToday,
   isCardCapReachedToday,
+  isBonusAwardedToday,
 } from "./dailyMission";
 
 beforeEach(() => {
@@ -136,18 +138,21 @@ describe("completeBonus", () => {
     expect(completeBonus(998, () => 0, now)).toBeNull(); // 이미 지급됨
   });
 
-  it("일반 완료가 카드 지급 상한을 넘겨도 보너스 카드는 상한과 무관하게 지급된다", () => {
+  it("보너스도 같은 하루 카드 상한을 공유한다 — 일반 완료로 상한을 다 썼으면 보너스는 카드 없이 완료만 기록된다", () => {
     const now = new Date("2026-08-07T09:00:00.000Z");
     addCustomMission("커스텀1", now);
-    addCustomMission("커스텀2", now);
-    addCustomMission("커스텀3", now); // 기본 6 + 커스텀 3 = 9개, 상한(8)보다 많음
+    addCustomMission("커스텀2", now); // 기본 6 + 커스텀 2 = 8개 = 상한과 정확히 같음
 
     const allIds = getAllMissions().map((m) => m.id);
-    allIds.forEach((id, i) => completeMission(id, i + 1, () => 0, now));
+    allIds.forEach((id, i) => {
+      const result = completeMission(id, i + 1, () => 0, now);
+      expect(result.cardResult).not.toBeNull(); // 8개까지는 전부 카드 지급, 상한 정확히 소진
+    });
     expect(isCardCapReachedToday(now)).toBe(true);
 
     const bonus = completeBonus(999, () => 0, now);
-    expect(bonus).not.toBeNull(); // 상한을 넘긴 상태여도 보너스는 지급됨
+    expect(bonus).toBeNull(); // 상한을 이미 다 써서 보너스는 카드 없음
+    expect(isBonusAwardedToday(now)).toBe(true); // 그래도 "전체 완료" 자체는 기록됨
   });
 });
 
@@ -165,6 +170,19 @@ describe("통계", () => {
     completeMission(DEFAULT_MISSIONS[0].id, 1, () => 0, monday);
     completeMission(DEFAULT_MISSIONS[1].id, 2, () => 0, friday);
     expect(getWeeklyCompletedCount(friday)).toBe(2);
+  });
+
+  it("getCardsAwardedToday는 습관 체크 수가 아니라 실제 카드 지급 수(상한 반영)를 센다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    for (let i = 0; i < DAILY_CARD_CAP + 2; i++) addCustomMission(`미션${i}`, now);
+    const customIds = getCustomMissions().map((m) => m.id);
+
+    customIds.forEach((id, i) => completeMission(id, i + 1, () => 0, now));
+
+    // 습관 체크는 DAILY_CARD_CAP+2번 다 기록되지만
+    expect(getTodayCompletedCount(now)).toBe(DAILY_CARD_CAP + 2);
+    // 카드는 상한(DAILY_CARD_CAP)만큼만 실제로 지급된다
+    expect(getCardsAwardedToday(now)).toBe(DAILY_CARD_CAP);
   });
 });
 

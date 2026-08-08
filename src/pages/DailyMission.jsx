@@ -13,7 +13,7 @@ import {
   completeBonus,
   getTodayCompletedCount,
   getWeeklyCompletedCount,
-  isBonusAwardedToday,
+  getCardsAwardedToday,
   isCardCapReachedToday,
   DAILY_CARD_CAP,
 } from "../utils/dailyMission";
@@ -100,7 +100,7 @@ export default function DailyMission() {
 
   const todayCount = getTodayCompletedCount();
   const weekCount = getWeeklyCompletedCount();
-  const cardsToday = Math.min(todayCount, DAILY_CARD_CAP) + (isBonusAwardedToday() ? 1 : 0);
+  const cardsToday = getCardsAwardedToday();
   const capReached = isCardCapReachedToday();
   const customMissions = getCustomMissions();
   const activeReveal = revealQueue[0] || null;

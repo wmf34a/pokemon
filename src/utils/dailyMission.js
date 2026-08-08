@@ -11,12 +11,11 @@ const MAX_LABEL_LENGTH = 20;
 const LOG_RETENTION_DAYS = 90;
 const BONUS_MISSION_ID = "__bonus__";
 
-// 미션 완료로 하루에 지급할 수 있는 카드 수 상한(보너스 카드는 별도, 상한에
-// 포함하지 않는다 — 전체 미션을 다 끝낸 날의 보상은 항상 준다). 기본 미션
-// 6개 + 커스텀 몇 개 정도는 상한에 안 걸리게, 그러면서도 커스텀 미션을
+// 하루에 지급할 수 있는 카드 수 상한(일반 미션 + 보너스 카드 합산). 기본
+// 미션 6개 + 커스텀 몇 개 정도는 상한에 안 걸리게, 그러면서도 커스텀 미션을
 // 계속 추가해 카드를 무한정 파밍하지는 못하게 6(기본)보다 살짝 여유 있는
-// 값으로 잡는다. 상한을 넘긴 완료는 습관 기록(체크/시간)은 그대로 남지만
-// 카드는 더 지급하지 않는다.
+// 값으로 잡는다. 상한을 넘긴 완료(보너스 포함)는 습관 기록(체크/시간)은
+// 그대로 남지만 카드는 더 지급하지 않는다.
 export const DAILY_CARD_CAP = 8;
 
 export const DEFAULT_MISSIONS = [
@@ -95,9 +94,9 @@ function trimOldEntries(log, now) {
   return log.filter((entry) => new Date(entry.completedAt).getTime() >= cutoff);
 }
 
-function logCompletion(missionId, now) {
+function logCompletion(missionId, now, cardAwarded) {
   const log = trimOldEntries(readLog(), now);
-  log.push({ missionId, date: todayDateString(now), completedAt: now.toISOString() });
+  log.push({ missionId, date: todayDateString(now), completedAt: now.toISOString(), cardAwarded });
   writeJSON(LOG_KEY, log);
 }
 
@@ -129,8 +128,16 @@ export function getTodayCompletedCount(now = new Date()) {
   return readLog().filter((e) => e.date === today && e.missionId !== BONUS_MISSION_ID).length;
 }
 
+// 실제로 카드가 지급된 완료(일반 + 보너스 합산) 수 — 상한 판정과 "오늘 획득
+// 카드" 표시에 쓴다. getTodayCompletedCount(습관 체크 수)와는 다르다: 상한을
+// 넘긴 완료도 습관 체크로는 세지만 카드가 안 나왔으면 여기엔 안 잡힌다.
+export function getCardsAwardedToday(now = new Date()) {
+  const today = todayDateString(now);
+  return readLog().filter((e) => e.date === today && e.cardAwarded).length;
+}
+
 export function isCardCapReachedToday(now = new Date()) {
-  return getTodayCompletedCount(now) >= DAILY_CARD_CAP;
+  return getCardsAwardedToday(now) >= DAILY_CARD_CAP;
 }
 
 export function getWeeklyCompletedCount(now = new Date()) {
@@ -148,22 +155,29 @@ export function getWeeklyCompletedCount(now = new Date()) {
 }
 
 // pokemonId는 호출부가 pickRandom(전체 포켓몬, 1)로 미리 뽑아 넘긴다.
-// cardResult는 오늘 카드 지급 상한(DAILY_CARD_CAP)을 넘기면 null이 된다 —
-// 그래도 완료 로그는 남으므로 습관 체크 자체는 상한과 무관하게 계속 유효하다.
+// cardResult는 오늘 카드 지급 상한(DAILY_CARD_CAP, 보너스 포함 합산)을
+// 넘기면 null이 된다 — 그래도 완료 로그는 남으므로 습관 체크 자체는 상한과
+// 무관하게 계속 유효하다.
 export function completeMission(missionId, pokemonId, random = Math.random, now = new Date()) {
   if (isMissionCompletedToday(missionId, now)) return null;
 
-  logCompletion(missionId, now);
-  const withinCap = getTodayCompletedCount(now) <= DAILY_CARD_CAP;
+  const withinCap = getCardsAwardedToday(now) < DAILY_CARD_CAP;
   const cardResult = withinCap ? awardCard(pokemonId, random) : null;
+  logCompletion(missionId, now, withinCap);
 
   return { cardResult, allCompleted: isAllMissionsCompletedToday(now) };
 }
 
+// 보너스도 일반 미션과 같은 하루 상한(DAILY_CARD_CAP)을 공유한다 — 상한을
+// 이미 다 썼으면 "전체 미션 완료" 자체는 기록되지만(isBonusAwardedToday가
+// true가 됨) 카드는 지급하지 않는다.
 export function completeBonus(pokemonId, random = Math.random, now = new Date()) {
   if (!isAllMissionsCompletedToday(now)) return null;
   if (isBonusAwardedToday(now)) return null;
 
-  logCompletion(BONUS_MISSION_ID, now);
-  return awardCard(pokemonId, random);
+  const withinCap = getCardsAwardedToday(now) < DAILY_CARD_CAP;
+  const cardResult = withinCap ? awardCard(pokemonId, random) : null;
+  logCompletion(BONUS_MISSION_ID, now, withinCap);
+
+  return cardResult;
 }
