@@ -26,7 +26,7 @@ const MODES = [
 // 페이지로 합쳐져서 여기엔 없다 — 홈 화면 "내 포켓몬" 카드에서 바로 간다.
 const MORE_MODES = [
   { key: "daily", icon: CalendarIcon, title: "오늘의 포켓몬", desc: "매일 새로운 포켓몬을 만나보세요", to: "/daily" },
-  { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈를 풀고 카드를 모아보세요", to: "/collection" },
+  { key: "collection", icon: LayersIcon, title: "카드 수집", desc: "퀴즈 정답이나 미션 완료로 카드를 모아보세요", to: "/collection" },
   { key: "missions", icon: ClipboardCheckIcon, title: "일일 미션", desc: "오늘의 습관을 완료하고 카드 받기", to: "/missions" },
 ];
 
