@@ -11,11 +11,14 @@ import {
   EVOLUTION_THRESHOLD,
 } from "../utils/myPokemon";
 import { getCareState, getMoodLevel, isAnyActionReady, MOOD_LABEL_KO, MOOD_FILTER } from "../utils/pokemonCare";
+import { getAllMissions, getTodayCompletedCount } from "../utils/dailyMission";
+import { ClipboardCheckIcon } from "../components/Icons";
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
   const dailyPokemon = useDailyPokemon();
   const [all, setAll] = useState([]);
+  const [missionTotals, setMissionTotals] = useState(null);
   // null | "branch" (분기 선택 대기) | "reveal" (짠! 화면)
   const [celebrationStep, setCelebrationStep] = useState(null);
 
@@ -28,6 +31,7 @@ export default function Home() {
         Array.isArray(rec.pendingBranchChoices) && rec.pendingBranchChoices.length > 0;
       setCelebrationStep(hasBranchChoice ? "branch" : "reveal");
     }
+    setMissionTotals({ done: getTodayCompletedCount(), total: getAllMissions().length });
   }, []);
 
   const currentPokemon = useMemo(
@@ -371,6 +375,47 @@ export default function Home() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>오늘의 포켓몬</div>
             <div style={{ fontWeight: 700 }}>{dailyPokemon.nameKo}</div>
+          </div>
+        </Link>
+      )}
+
+      {missionTotals && (
+        <Link
+          to="/missions"
+          className="press pop-card"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            marginTop: "var(--space-3)",
+            padding: "var(--space-3) var(--space-4)",
+            borderRadius: "var(--radius-lg)",
+            background: "var(--color-surface)",
+            boxShadow: "var(--shadow-card)",
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              background: "color-mix(in srgb, var(--color-accent) 30%, transparent)",
+              color: "var(--color-accent-ink)",
+              flexShrink: 0,
+            }}
+          >
+            <ClipboardCheckIcon size={20} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>일일 미션</div>
+            <div style={{ fontWeight: 700 }}>
+              오늘 {missionTotals.done}/{missionTotals.total} 완료
+            </div>
           </div>
         </Link>
       )}

@@ -105,6 +105,11 @@ export default function DailyMission() {
   const customMissions = getCustomMissions();
   const activeReveal = revealQueue[0] || null;
 
+  // 카드 분모는 미션 수와 무관한 고정 상한(DAILY_CARD_CAP)이 아니라 "오늘 미션
+  // 수 + 보너스 1장"과 상한 중 더 작은 값이다 — 그래야 완료 X/Y와 나란히 봤을 때
+  // 분모가 서로 안 맞아 보이는(예: 완료 9/9인데 카드는 /10) 혼란이 없다.
+  const maxCardsToday = Math.min(DAILY_CARD_CAP, missions.length + 1);
+
   return (
     <AppShell title="일일 미션" backTo="/quiz">
       <div
@@ -120,11 +125,14 @@ export default function DailyMission() {
             오늘 완료 {todayCount}/{missions.length}
           </span>
           <span>
-            오늘 획득 카드 {cardsToday}/{DAILY_CARD_CAP}장
+            오늘 획득 카드 {cardsToday}/{maxCardsToday}장
           </span>
         </div>
         <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>
           이번 주 {weekCount}개 완료 · 매일 자정에 초기화돼요
+        </div>
+        <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
+          카드 분모 = 오늘 미션 수({missions.length}) + 보너스 1장 (최대 {DAILY_CARD_CAP}장)
         </div>
         {capReached && (
           <div style={{ fontSize: 12, color: "var(--color-danger)", marginTop: 4 }}>
