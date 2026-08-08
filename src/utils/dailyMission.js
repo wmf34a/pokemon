@@ -11,6 +11,14 @@ const MAX_LABEL_LENGTH = 20;
 const LOG_RETENTION_DAYS = 90;
 const BONUS_MISSION_ID = "__bonus__";
 
+// 미션 완료로 하루에 지급할 수 있는 카드 수 상한(보너스 카드는 별도, 상한에
+// 포함하지 않는다 — 전체 미션을 다 끝낸 날의 보상은 항상 준다). 기본 미션
+// 6개 + 커스텀 몇 개 정도는 상한에 안 걸리게, 그러면서도 커스텀 미션을
+// 계속 추가해 카드를 무한정 파밍하지는 못하게 6(기본)보다 살짝 여유 있는
+// 값으로 잡는다. 상한을 넘긴 완료는 습관 기록(체크/시간)은 그대로 남지만
+// 카드는 더 지급하지 않는다.
+export const DAILY_CARD_CAP = 8;
+
 export const DEFAULT_MISSIONS = [
   { id: "gotoSchool", label: "등원하기" },
   { id: "comeHome", label: "하원하기" },
@@ -121,6 +129,10 @@ export function getTodayCompletedCount(now = new Date()) {
   return readLog().filter((e) => e.date === today && e.missionId !== BONUS_MISSION_ID).length;
 }
 
+export function isCardCapReachedToday(now = new Date()) {
+  return getTodayCompletedCount(now) >= DAILY_CARD_CAP;
+}
+
 export function getWeeklyCompletedCount(now = new Date()) {
   const day = now.getDay(); // 0 = 일요일
   const diffToMonday = (day + 6) % 7; // 월요일까지 며칠 전인지 (월요일 자신은 0)
@@ -136,11 +148,14 @@ export function getWeeklyCompletedCount(now = new Date()) {
 }
 
 // pokemonId는 호출부가 pickRandom(전체 포켓몬, 1)로 미리 뽑아 넘긴다.
+// cardResult는 오늘 카드 지급 상한(DAILY_CARD_CAP)을 넘기면 null이 된다 —
+// 그래도 완료 로그는 남으므로 습관 체크 자체는 상한과 무관하게 계속 유효하다.
 export function completeMission(missionId, pokemonId, random = Math.random, now = new Date()) {
   if (isMissionCompletedToday(missionId, now)) return null;
 
   logCompletion(missionId, now);
-  const cardResult = awardCard(pokemonId, random);
+  const withinCap = getTodayCompletedCount(now) <= DAILY_CARD_CAP;
+  const cardResult = withinCap ? awardCard(pokemonId, random) : null;
 
   return { cardResult, allCompleted: isAllMissionsCompletedToday(now) };
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   DEFAULT_MISSIONS,
+  DAILY_CARD_CAP,
   getCustomMissions,
   addCustomMission,
   removeCustomMission,
@@ -11,6 +12,7 @@ import {
   completeBonus,
   getTodayCompletedCount,
   getWeeklyCompletedCount,
+  isCardCapReachedToday,
 } from "./dailyMission";
 
 beforeEach(() => {
@@ -97,6 +99,26 @@ describe("completeMission", () => {
     const last = completeMission(ids[ids.length - 1], 99, () => 0, now);
     expect(last.allCompleted).toBe(true);
   });
+
+  it("하루 카드 지급 상한(DAILY_CARD_CAP)을 넘긴 완료는 cardResult:null이지만 로그는 남는다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    for (let i = 0; i < DAILY_CARD_CAP; i++) {
+      addCustomMission(`미션${i}`, now);
+    }
+    const customIds = getCustomMissions().map((m) => m.id);
+
+    // 커스텀 미션만으로 이미 상한(DAILY_CARD_CAP)만큼 완료 — 전부 카드 지급됨
+    customIds.forEach((id, i) => {
+      const result = completeMission(id, i + 1, () => 0, now);
+      expect(result.cardResult).not.toBeNull();
+    });
+    expect(isCardCapReachedToday(now)).toBe(true);
+
+    // 상한을 넘긴 다음 완료(기본 미션 하나)는 카드 없이 로그만 남는다
+    const overCap = completeMission("gotoSchool", 999, () => 0, now);
+    expect(overCap.cardResult).toBeNull();
+    expect(isMissionCompletedToday("gotoSchool", now)).toBe(true);
+  });
 });
 
 describe("completeBonus", () => {
@@ -112,6 +134,20 @@ describe("completeBonus", () => {
     const bonus = completeBonus(999, () => 0.9, now);
     expect(bonus).toEqual({ isNew: true, grade: "rare" });
     expect(completeBonus(998, () => 0, now)).toBeNull(); // 이미 지급됨
+  });
+
+  it("일반 완료가 카드 지급 상한을 넘겨도 보너스 카드는 상한과 무관하게 지급된다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    addCustomMission("커스텀1", now);
+    addCustomMission("커스텀2", now);
+    addCustomMission("커스텀3", now); // 기본 6 + 커스텀 3 = 9개, 상한(8)보다 많음
+
+    const allIds = getAllMissions().map((m) => m.id);
+    allIds.forEach((id, i) => completeMission(id, i + 1, () => 0, now));
+    expect(isCardCapReachedToday(now)).toBe(true);
+
+    const bonus = completeBonus(999, () => 0, now);
+    expect(bonus).not.toBeNull(); // 상한을 넘긴 상태여도 보너스는 지급됨
   });
 });
 

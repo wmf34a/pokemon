@@ -14,6 +14,8 @@ import {
   getTodayCompletedCount,
   getWeeklyCompletedCount,
   isBonusAwardedToday,
+  isCardCapReachedToday,
+  DAILY_CARD_CAP,
 } from "../utils/dailyMission";
 import { vibrate } from "../utils/haptics";
 import { useMissionChime } from "../hooks/useMissionChime";
@@ -58,7 +60,10 @@ export default function DailyMission() {
     const outcome = completeMission(missionId, picked.id);
     if (!outcome) return; // 방어적: 이미 완료된 상태였다면 아무 것도 하지 않음
 
-    const queue = [{ result: outcome.cardResult, pokemon: picked }];
+    // 오늘 카드 지급 상한을 넘기면 cardResult가 null이다 — 미션 완료(체크/시간)는
+    // 그대로 기록되지만 뽑기 연출은 띄우지 않는다.
+    const queue = [];
+    if (outcome.cardResult) queue.push({ result: outcome.cardResult, pokemon: picked });
 
     if (outcome.allCompleted) {
       const bonusPicked = pickRandom(all, 1)[0];
@@ -95,7 +100,8 @@ export default function DailyMission() {
 
   const todayCount = getTodayCompletedCount();
   const weekCount = getWeeklyCompletedCount();
-  const cardsToday = todayCount + (isBonusAwardedToday() ? 1 : 0);
+  const cardsToday = Math.min(todayCount, DAILY_CARD_CAP) + (isBonusAwardedToday() ? 1 : 0);
+  const capReached = isCardCapReachedToday();
   const customMissions = getCustomMissions();
   const activeReveal = revealQueue[0] || null;
 
@@ -118,6 +124,11 @@ export default function DailyMission() {
         <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>
           이번 주 {weekCount}개 완료 · 매일 자정에 초기화돼요
         </div>
+        {capReached && (
+          <div style={{ fontSize: 12, color: "var(--color-danger)", marginTop: 4 }}>
+            오늘 카드 지급 한도({DAILY_CARD_CAP}장)에 도달했어요 — 미션 체크는 계속 기록돼요
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: "var(--space-4)" }}>
