@@ -319,3 +319,19 @@ img {
     transition: none;
   }
 }
+
+@keyframes care-idle-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .care-idle-bob {
+    animation: care-idle-bob 2.4s ease-in-out infinite;
+  }
+}

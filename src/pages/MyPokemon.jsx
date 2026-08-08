@@ -18,6 +18,14 @@ import {
 
 const GRUMPY_TOAST_KEY = "pokemonCare.grumpyToastShown.v1";
 
+// 기분이 좋을수록 더 활발하게, 지치거나 삐쳤을수록 느리게 흔들린다.
+const IDLE_BOB_DURATION = {
+  happy: "1.6s",
+  normal: "2.4s",
+  tired: "3.4s",
+  grumpy: "4.2s",
+};
+
 function formatCooldown(ms) {
   const totalMinutes = Math.ceil(ms / 60_000);
   const hours = Math.floor(totalMinutes / 60);
@@ -165,7 +173,13 @@ export default function MyPokemon() {
         <img
           src={p.artwork}
           alt={record.nickname}
-          style={{ width: 180, height: 180, filter: mood ? MOOD_FILTER[mood] : "none" }}
+          className="care-idle-bob"
+          style={{
+            width: 180,
+            height: 180,
+            filter: mood ? MOOD_FILTER[mood] : "none",
+            animationDuration: IDLE_BOB_DURATION[mood] || IDLE_BOB_DURATION.normal,
+          }}
         />
         <div style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
           #{String(p.id).padStart(4, "0")}

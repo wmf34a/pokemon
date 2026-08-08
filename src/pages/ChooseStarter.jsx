@@ -11,6 +11,7 @@ import {
 } from "../utils/pokemonData";
 import { matchesQuery } from "../utils/hangul";
 import { getStarterCandidates, chooseStarter } from "../utils/myPokemon";
+import { resetCareState } from "../utils/pokemonCare";
 
 export default function ChooseStarter() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function ChooseStarter() {
 
   function handleConfirm() {
     chooseStarter(picked, nickname);
+    resetCareState(); // 새 포켓몬은 이전 포켓몬의 배고픔/행복/피로/쿨다운을 물려받지 않는다
     navigate("/mine");
   }
 

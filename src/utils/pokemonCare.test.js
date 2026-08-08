@@ -11,6 +11,7 @@ import {
   getSleepCooldownMs,
   isAnyActionReady,
   getMoodLevel,
+  resetCareState,
 } from "./pokemonCare";
 
 beforeEach(() => {
@@ -142,6 +143,21 @@ describe("액션 (쿨다운 기반)", () => {
     expect(isAnyActionReady(now)).toBe(false); // 셋 다 방금 함 — 전부 쿨다운 중
 
     expect(isAnyActionReady(new Date(now.getTime() + 6 * 3_600_000))).toBe(true); // 밥/놀기 쿨다운 끝
+  });
+});
+
+describe("resetCareState", () => {
+  it("이전 포켓몬의 배고픔/행복/피로/쿨다운을 새 포켓몬에 물려주지 않고 기본값으로 되돌린다", () => {
+    const now = new Date("2026-08-07T09:00:00.000Z");
+    getCareState(now);
+    feed(now); // 배고픔 90, lastFedAt = now
+    play(now); // 행복 100, 피로 35
+
+    const reset = resetCareState(new Date(now.getTime() + 60_000));
+    expect(reset.hunger).toBe(80);
+    expect(reset.happiness).toBe(80);
+    expect(reset.fatigue).toBe(20);
+    expect(canFeed(new Date(now.getTime() + 60_000))).toBe(true); // 쿨다운도 초기화됨
   });
 });
 

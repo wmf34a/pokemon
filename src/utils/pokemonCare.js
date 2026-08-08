@@ -73,6 +73,15 @@ export function getCareState(now = new Date()) {
   return writeRecord(applyDecay(base, now));
 }
 
+// 새 포켓몬을 고를 때(처음 시작/졸업/리셋 후 다시 고르기) 호출한다. 이전
+// 포켓몬의 배고픔/행복/피로/쿨다운을 새 포켓몬이 그대로 물려받으면 안 되므로
+// 기본값으로 되돌린다. myPokemon.js를 직접 참조하지 않고(두 시스템은 계속
+// 독립적으로 유지), 새 스타터를 확정하는 화면(ChooseStarter)이 두 리셋을
+// 함께 호출해준다.
+export function resetCareState(now = new Date()) {
+  return writeRecord(defaultRecord(now));
+}
+
 // lastAt이 없으면(한 번도 안 했으면) 쿨다운 없음(0). 있으면 쿨다운 종료까지 남은
 // 밀리초, 이미 지났으면 0.
 function remainingCooldownMs(lastAt, cooldownHours, now) {
