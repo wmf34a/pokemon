@@ -76,3 +76,13 @@ export function awardCard(pokemonId, random = Math.random) {
   });
   return { isNew: true, grade };
 }
+
+// 퀴즈 정답은 매번 카드를 주지 않고 이 확률로만 지급한다 — 100%로 주면 퀴즈
+// 몇 판만 돌려도 전체 포켓몬을 다 모아버려서 수집 재미가 금방 사라진다.
+// 일일 미션 완료는 습관 보상이라 확률 없이 awardCard를 그대로 확정 호출한다.
+export const QUIZ_CARD_DROP_RATE = 0.25;
+
+export function awardCardOnQuizAnswer(pokemonId, random = Math.random) {
+  if (random() >= QUIZ_CARD_DROP_RATE) return null; // 이번엔 카드 없음(꽝)
+  return awardCard(pokemonId, random);
+}

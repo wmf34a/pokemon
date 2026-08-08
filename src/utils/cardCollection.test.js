@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { rollGrade, awardCard, getCards, hasCard } from "./cardCollection";
+import {
+  rollGrade,
+  awardCard,
+  getCards,
+  hasCard,
+  awardCardOnQuizAnswer,
+  QUIZ_CARD_DROP_RATE,
+} from "./cardCollection";
 
 beforeEach(() => {
   localStorage.clear();
@@ -57,5 +64,24 @@ describe("awardCard", () => {
     expect(() => awardCard(25, () => 0)).not.toThrow();
     getSpy.mockRestore();
     setSpy.mockRestore();
+  });
+});
+
+describe("awardCardOnQuizAnswer", () => {
+  it("난수가 QUIZ_CARD_DROP_RATE 미만이면 카드를 지급한다", () => {
+    const result = awardCardOnQuizAnswer(25, () => 0);
+    expect(result).toEqual({ isNew: true, grade: "common" });
+    expect(hasCard(25)).toBe(true);
+  });
+
+  it("난수가 QUIZ_CARD_DROP_RATE 이상이면 카드를 지급하지 않고 null을 반환한다", () => {
+    const result = awardCardOnQuizAnswer(25, () => QUIZ_CARD_DROP_RATE);
+    expect(result).toBeNull();
+    expect(hasCard(25)).toBe(false);
+  });
+
+  it("경계값 바로 아래는 지급, 정확히 경계값은 미지급이다", () => {
+    expect(awardCardOnQuizAnswer(1, () => QUIZ_CARD_DROP_RATE - 0.0001)).not.toBeNull();
+    expect(awardCardOnQuizAnswer(2, () => QUIZ_CARD_DROP_RATE)).toBeNull();
   });
 });

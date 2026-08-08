@@ -11,7 +11,7 @@ import {
 } from "../utils/pokemonData";
 import { getEvolutionQuizCandidates, buildEvolutionChain } from "../utils/evolutionQuizChain";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
-import { awardCard } from "../utils/cardCollection";
+import { awardCardOnQuizAnswer } from "../utils/cardCollection";
 import EvolutionToast from "../components/EvolutionToast";
 import CardToast from "../components/CardToast";
 import { primaryBtn, hintBtn } from "../styles/tokens";
@@ -126,7 +126,7 @@ export default function EvolutionQuiz() {
         setScore((s) => s + earned);
         setCorrectCount((c) => c + 1);
         setEvolutionResult(await awardPoints(earned));
-        setCardResult(awardCard(start.id));
+        setCardResult(awardCardOnQuizAnswer(start.id));
       }
     }
   }

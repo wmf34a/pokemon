@@ -12,7 +12,7 @@ import {
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
 import EvolutionToast from "../components/EvolutionToast";
-import { awardCard } from "../utils/cardCollection";
+import { awardCardOnQuizAnswer } from "../utils/cardCollection";
 import CardToast from "../components/CardToast";
 
 // 힌트를 누를 때마다(0~3단계) 배경 확대 배율이 점점 줄어들어 조금씩 더 넓은 범위가
@@ -128,7 +128,7 @@ export default function ZoomQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
-      setCardResult(awardCard(answer.id));
+      setCardResult(awardCardOnQuizAnswer(answer.id));
     }
   }
 
@@ -143,7 +143,7 @@ export default function ZoomQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
-      setCardResult(awardCard(answer.id));
+      setCardResult(awardCardOnQuizAnswer(answer.id));
     }
   }
 

@@ -13,7 +13,7 @@ import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
 import EvolutionToast from "../components/EvolutionToast";
-import { awardCard } from "../utils/cardCollection";
+import { awardCardOnQuizAnswer } from "../utils/cardCollection";
 import CardToast from "../components/CardToast";
 
 const HINT_STEPS = ["type", "silhouette", "chosung"];
@@ -134,7 +134,7 @@ export default function CryQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
-      setCardResult(awardCard(answer.id));
+      setCardResult(awardCardOnQuizAnswer(answer.id));
     }
   }
 
@@ -149,7 +149,7 @@ export default function CryQuiz() {
       setScore((s) => s + earned);
       setCorrectCount((c) => c + 1);
       setEvolutionResult(await awardPoints(earned));
-      setCardResult(awardCard(answer.id));
+      setCardResult(awardCardOnQuizAnswer(answer.id));
     }
   }
 
