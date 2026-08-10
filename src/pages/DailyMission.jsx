@@ -141,13 +141,18 @@ export default function DailyMission() {
             paddingLeft: 16,
           }}
         >
-          <li>기본 미션은 {DEFAULT_MISSIONS.length}개예요.</li>
+          <li>자정에 초기화되는 건 "완료했는지" 표시뿐이에요. 미션 목록은 그대로 남아있어요.</li>
+          <li>기본 미션 {DEFAULT_MISSIONS.length}개는 항상 있어요.</li>
           <li>
-            커스텀 미션은 최대 {MAX_CUSTOM}개까지 만들 수 있어요. (하루에 새로 추가할 수 있는
-            건 {MAX_NEW_CUSTOM_PER_DAY}개까지예요 — 그래서 10개를 다 채우려면 며칠 걸려요.)
+            커스텀 미션은 한 번 만들면 계속 남아있고, 최대 {MAX_CUSTOM}개까지 만들어 모아둘 수
+            있어요(기본 {DEFAULT_MISSIONS.length}개와는 별도 개수예요). 하루에 새로 만들 수 있는
+            건 {MAX_NEW_CUSTOM_PER_DAY}개까지라, 다 채우려면 며칠 걸려요.
           </li>
           <li>미션 하나 완료하면 카드 1장, 전체 완료하면 보너스 카드 1장이 더 나와요.</li>
-          <li>단, 하루에 받을 수 있는 카드는 최대 {DAILY_CARD_CAP}장이에요.</li>
+          <li>
+            단, 미션이 몇 개든 상관없이 하루에 받을 수 있는 카드는 최대 {DAILY_CARD_CAP}장이에요
+            (미션 개수 상한과는 별개의 규칙이에요).
+          </li>
         </ul>
         {capReached && (
           <div style={{ fontSize: 12, color: "var(--color-danger)", marginTop: 4 }}>
