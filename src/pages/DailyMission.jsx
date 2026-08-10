@@ -14,19 +14,15 @@ import {
   getTodayCompletedCount,
   getWeeklyCompletedCount,
   getCardsAwardedToday,
-  isCardCapReachedToday,
-  DAILY_CARD_CAP,
   DEFAULT_MISSIONS,
-  MAX_CUSTOM,
-  MAX_NEW_CUSTOM_PER_DAY,
+  MAX_CUSTOM_PER_DAY,
 } from "../utils/dailyMission";
 import { vibrate } from "../utils/haptics";
 
 const ERROR_LABEL_KO = {
   empty: "미션 이름을 입력해주세요",
   too_long: "미션 이름은 20자 이하로 적어주세요",
-  limit_reached: "커스텀 미션은 최대 10개까지 추가할 수 있어요",
-  daily_limit_reached: "새 미션은 하루 2개까지만 추가할 수 있어요",
+  limit_reached: "커스텀 미션은 오늘 더 못 만들어요(하루 최대 4개)",
 };
 
 function formatTime(iso) {
@@ -62,10 +58,7 @@ export default function DailyMission() {
     const outcome = completeMission(missionId, picked.id);
     if (!outcome) return; // 방어적: 이미 완료된 상태였다면 아무 것도 하지 않음
 
-    // 오늘 카드 지급 상한을 넘기면 cardResult가 null이다 — 미션 완료(체크/시간)는
-    // 그대로 기록되지만 뽑기 연출은 띄우지 않는다.
-    const queue = [];
-    if (outcome.cardResult) queue.push({ result: outcome.cardResult, pokemon: picked });
+    const queue = [{ result: outcome.cardResult, pokemon: picked }];
 
     if (outcome.allCompleted) {
       const bonusPicked = pickRandom(all, 1)[0];
@@ -102,14 +95,9 @@ export default function DailyMission() {
   const todayCount = getTodayCompletedCount();
   const weekCount = getWeeklyCompletedCount();
   const cardsToday = getCardsAwardedToday();
-  const capReached = isCardCapReachedToday();
   const customMissions = getCustomMissions();
   const activeReveal = revealQueue[0] || null;
-
-  // 카드 분모는 미션 수와 무관한 고정 상한(DAILY_CARD_CAP)이 아니라 "오늘 미션
-  // 수 + 보너스 1장"과 상한 중 더 작은 값이다 — 그래야 완료 X/Y와 나란히 봤을 때
-  // 분모가 서로 안 맞아 보이는(예: 완료 9/9인데 카드는 /10) 혼란이 없다.
-  const maxCardsToday = Math.min(DAILY_CARD_CAP, missions.length + 1);
+  const customFull = customMissions.length >= MAX_CUSTOM_PER_DAY;
 
   return (
     <AppShell title="일일 미션" backTo="/quiz">
@@ -125,12 +113,10 @@ export default function DailyMission() {
           <span>
             오늘 완료 {todayCount}/{missions.length}
           </span>
-          <span>
-            오늘 획득 카드 {cardsToday}/{maxCardsToday}장
-          </span>
+          <span>오늘 획득 카드 {cardsToday}장</span>
         </div>
         <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>
-          이번 주 {weekCount}개 완료 · 매일 자정에 초기화돼요
+          이번 주 {weekCount}개 완료
         </div>
         <ul
           style={{
@@ -141,24 +127,17 @@ export default function DailyMission() {
             paddingLeft: 16,
           }}
         >
-          <li>자정에 초기화되는 건 "완료했는지" 표시뿐이에요. 미션 목록은 그대로 남아있어요.</li>
-          <li>기본 미션 {DEFAULT_MISSIONS.length}개는 항상 있어요.</li>
+          <li>기본 미션 {DEFAULT_MISSIONS.length}개는 매일 항상 있어요.</li>
           <li>
-            커스텀 미션은 한 번 만들면 계속 남아있고, 최대 {MAX_CUSTOM}개까지 만들어 모아둘 수
-            있어요(기본 {DEFAULT_MISSIONS.length}개와는 별도 개수예요). 하루에 새로 만들 수 있는
-            건 {MAX_NEW_CUSTOM_PER_DAY}개까지라, 다 채우려면 며칠 걸려요.
+            커스텀 미션은 오늘 하루만 유지돼요 — 최대 {MAX_CUSTOM_PER_DAY}개까지 만들 수 있고,
+            자정이 지나면 목록에서 자동으로 사라져요(필요하면 다음날 다시 만들면 돼요).
           </li>
-          <li>미션 하나 완료하면 카드 1장, 전체 완료하면 보너스 카드 1장이 더 나와요.</li>
           <li>
-            단, 미션이 몇 개든 상관없이 하루에 받을 수 있는 카드는 최대 {DAILY_CARD_CAP}장이에요
-            (미션 개수 상한과는 별개의 규칙이에요).
+            그래서 하루에 볼 수 있는 미션은 최대 {DEFAULT_MISSIONS.length + MAX_CUSTOM_PER_DAY}개
+            (기본 {DEFAULT_MISSIONS.length} + 커스텀 {MAX_CUSTOM_PER_DAY})예요.
           </li>
+          <li>미션 하나 완료하면 카드 1장, 전체 완료하면 보너스 카드 1장이 더 나와요 — 둘 다 확정 지급이에요.</li>
         </ul>
-        {capReached && (
-          <div style={{ fontSize: 12, color: "var(--color-danger)", marginTop: 4 }}>
-            오늘 카드 지급 한도({DAILY_CARD_CAP}장)에 도달했어요 — 미션 체크는 계속 기록돼요
-          </div>
-        )}
       </div>
 
       <div style={{ marginTop: "var(--space-4)" }}>
@@ -207,7 +186,7 @@ export default function DailyMission() {
 
       <div style={{ marginTop: "var(--space-5)" }}>
         <h3 style={{ fontSize: 15, fontFamily: "var(--font-heading)", fontWeight: 400 }}>
-          커스텀 미션
+          오늘의 커스텀 미션
         </h3>
         <form onSubmit={handleAddCustom} style={{ display: "flex", gap: 8, marginTop: 8 }}>
           <input
@@ -215,7 +194,7 @@ export default function DailyMission() {
             onChange={(e) => setCustomLabel(e.target.value)}
             maxLength={20}
             placeholder="새 미션 이름 (최대 20자)"
-            disabled={customMissions.length >= 10}
+            disabled={customFull}
             style={{
               flex: 1,
               padding: "10px 12px",
@@ -228,7 +207,7 @@ export default function DailyMission() {
           />
           <button
             type="submit"
-            disabled={customMissions.length >= 10}
+            disabled={customFull}
             className="press"
             style={{
               minHeight: 40,
@@ -256,9 +235,7 @@ export default function DailyMission() {
             >
               <span style={{ flex: 1 }}>{m.label}</span>
               {doneToday ? (
-                <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
-                  오늘 완료됨 · 내일부터 삭제 가능
-                </span>
+                <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>오늘 완료됨</span>
               ) : (
                 <button
                   type="button"
