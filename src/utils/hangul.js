@@ -43,3 +43,27 @@ export function matchesQuery(name, query) {
   }
   return name.toLowerCase().includes(q.toLowerCase());
 }
+
+/**
+ * 받침이 있는가.
+ *
+ * 한글 음절은 0xAC00 부터 28개 단위로 종성이 돌아간다. 나머지가 0이면 받침이 없다.
+ * 한글이 아닌 글자로 끝나면(숫자·영문) 없는 것으로 본다.
+ */
+export function hasJongseong(word) {
+  if (!word) return false;
+  const last = word[word.length - 1];
+  const code = last.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return false;
+  return (code - 0xac00) % 28 !== 0;
+}
+
+/**
+ * 받침에 따라 조사를 고른다.
+ *
+ * "페어리과 강철" 처럼 붙여 놓으면 아이가 읽다가 걸린다.
+ * `josa("페어리", "과", "와")` → "와"
+ */
+export function josa(word, withJong, withoutJong) {
+  return hasJongseong(word) ? withJong : withoutJong;
+}

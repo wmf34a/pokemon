@@ -13,9 +13,13 @@ import {
 import { getCareState, getMoodLevel, isAnyActionReady, MOOD_LABEL_KO, MOOD_FILTER } from "../utils/pokemonCare";
 import { getAllMissions, getTodayCompletedCount } from "../utils/dailyMission";
 import { ClipboardCheckIcon } from "../components/Icons";
+import WhatsNewDialog from "../components/WhatsNewDialog";
+import { hasSeenTour, markTourSeen } from "../utils/notices";
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
+  // 새로 생긴 것 안내. 딱 한 번만 뜬다
+  const [showTour, setShowTour] = useState(() => !hasSeenTour());
   const dailyPokemon = useDailyPokemon();
   const [all, setAll] = useState([]);
   const [missionTotals, setMissionTotals] = useState(null);
@@ -194,8 +198,15 @@ export default function Home() {
     );
   }
 
+  function closeTour() {
+    markTourSeen();
+    setShowTour(false);
+  }
+
   return (
     <AppShell title={undefined}>
+      <WhatsNewDialog open={showTour} onClose={closeTour} />
+
       <div style={{ padding: "var(--space-4) 0 var(--space-2)" }}>
         <img
           src={`${import.meta.env.BASE_URL}pokeball.svg`}

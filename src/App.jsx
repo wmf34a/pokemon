@@ -7,6 +7,9 @@ import SilhouetteQuiz from "./pages/SilhouetteQuiz";
 import CryQuiz from "./pages/CryQuiz";
 import EvolutionQuiz from "./pages/EvolutionQuiz";
 import ZoomQuiz from "./pages/ZoomQuiz";
+import BugReport from "./pages/BugReport";
+import HintQuiz from "./pages/HintQuiz";
+import Notices from "./pages/Notices";
 import TypeQuiz from "./pages/TypeQuiz";
 import ChooseStarter from "./pages/ChooseStarter";
 import MyPokemon from "./pages/MyPokemon";
@@ -26,6 +29,9 @@ export default function App() {
       <Route path="/quiz/evolution" element={<EvolutionQuiz />} />
       <Route path="/quiz/zoom" element={<ZoomQuiz />} />
       <Route path="/quiz/type" element={<TypeQuiz />} />
+      <Route path="/quiz/hint" element={<HintQuiz />} />
+      <Route path="/notices" element={<Notices />} />
+      <Route path="/report" element={<BugReport />} />
       <Route path="/mine/choose" element={<ChooseStarter />} />
       <Route path="/mine" element={<MyPokemon />} />
       <Route path="/daily" element={<DailyPokemon />} />

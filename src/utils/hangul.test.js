@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getChosung, isChosungOnly, matchesQuery } from "./hangul";
+import { getChosung, isChosungOnly, matchesQuery, hasJongseong, josa } from "./hangul";
 
 describe("getChosung", () => {
   it("한글 이름을 초성으로 변환한다", () => {
@@ -33,5 +33,29 @@ describe("matchesQuery", () => {
 
   it("빈 검색어는 항상 매치한다", () => {
     expect(matchesQuery("피카츄", "")).toBe(true);
+  });
+});
+
+describe("hasJongseong", () => {
+  it("받침이 있으면 true", () => {
+    expect(hasJongseong("강철")).toBe(true);
+    expect(hasJongseong("불꽃")).toBe(true);
+  });
+
+  it("받침이 없으면 false", () => {
+    expect(hasJongseong("페어리")).toBe(false);
+    expect(hasJongseong("바위")).toBe(false);
+  });
+
+  it("한글이 아닌 글자로 끝나면 없는 것으로 본다", () => {
+    expect(hasJongseong("Pikachu")).toBe(false);
+    expect(hasJongseong("")).toBe(false);
+  });
+});
+
+describe("josa", () => {
+  it("받침에 따라 과/와를 고른다", () => {
+    expect(josa("강철", "과", "와")).toBe("과");
+    expect(josa("페어리", "과", "와")).toBe("와");
   });
 });

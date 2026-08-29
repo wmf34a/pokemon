@@ -267,3 +267,22 @@ export function ClipboardCheckIcon(props) {
     </Base>
   );
 }
+
+export function BellIcon(props) {
+  return (
+    <Base {...props}>
+      <path d="M18 15V10a6 6 0 1 0-12 0v5l-1.5 2.5h15z" />
+      <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+    </Base>
+  );
+}
+
+export function BugIcon(props) {
+  return (
+    <Base {...props}>
+      <path d="M9 6a3 3 0 0 1 6 0" />
+      <path d="M7.5 9.5h9v4.5a4.5 4.5 0 0 1-9 0z" />
+      <path d="M4.5 11h3M16.5 11h3M5 16.5l2.6-1.4M19 16.5l-2.6-1.4M6 7l2 1.5M18 7l-2 1.5" />
+    </Base>
+  );
+}

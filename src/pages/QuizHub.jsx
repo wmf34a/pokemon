@@ -8,6 +8,7 @@ import {
   SwordsIcon,
   ShuffleIcon,
   SearchIcon,
+  PuzzleIcon,
   CalendarIcon,
   LayersIcon,
   ClipboardCheckIcon,
@@ -19,6 +20,7 @@ const MODES = [
   { key: "type", icon: SwordsIcon, title: "타입 퀴즈", desc: "제시된 타입을 가진 포켓몬 고르기", to: "/quiz/type" },
   { key: "evolution", icon: ShuffleIcon, title: "진화 순서 맞추기", desc: "진화 전후 순서 배열", to: "/quiz/evolution" },
   { key: "zoom", icon: SearchIcon, title: "누구냔 넌", desc: "확대된 일부만 보고 맞히기", to: "/quiz/zoom" },
+  { key: "hint", icon: PuzzleIcon, title: "스무고개", desc: "힌트를 하나씩 듣고 좁혀가기 (자세한 힌트는 1세대만)", to: "/quiz/hint" },
 ];
 
 // 예전 "더보기" 탭에 있던 기능들. 하단 네비를 3탭(홈/도감/퀴즈)으로 줄이면서
