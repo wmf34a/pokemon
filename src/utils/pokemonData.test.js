@@ -1,9 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   sortPokemon,
   getAllTypes,
   getAllGenerations,
   GENERATION_LABEL_KO,
+  getDexSortPref,
+  setDexSortPref,
+  getDexGenerationPref,
+  setDexGenerationPref,
   pickRandom,
   SORT_OPTIONS,
 } from "./pokemonData";
@@ -62,5 +66,37 @@ describe("getAllGenerations", () => {
     ];
     expect(getAllGenerations(list)).toEqual(["generation-i", "generation-iii"]);
     expect(GENERATION_LABEL_KO["generation-iii"]).toBe("3세대");
+  });
+});
+
+describe("도감 세대 필터 저장", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("저장한 세대를 그대로 돌려주고, null 이면 지운다", () => {
+    expect(getDexGenerationPref()).toBe(null);
+    setDexGenerationPref("generation-iii");
+    expect(getDexGenerationPref()).toBe("generation-iii");
+    setDexGenerationPref(null);
+    expect(getDexGenerationPref()).toBe(null);
+  });
+
+  it("모르는 값이 들어 있으면 무시한다", () => {
+    localStorage.setItem("pokemonDex.generation", "generation-xxx");
+    expect(getDexGenerationPref()).toBe(null);
+  });
+});
+
+describe("도감 정렬 저장", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("저장 안 했으면 가나다순, 저장하면 그 값을 돌려준다", () => {
+    expect(getDexSortPref()).toBe(SORT_OPTIONS.NAME_KO);
+    setDexSortPref(SORT_OPTIONS.GENERATION);
+    expect(getDexSortPref()).toBe(SORT_OPTIONS.GENERATION);
+  });
+
+  it("모르는 값이 들어 있으면 기본값으로 되돌린다", () => {
+    localStorage.setItem("pokemonDex.sort", "없는정렬");
+    expect(getDexSortPref()).toBe(SORT_OPTIONS.NAME_KO);
   });
 });

@@ -146,3 +146,43 @@ export function getAllGenerations(list) {
   const set = new Set(list.map((p) => p.generation));
   return GENERATION_ORDER.filter((g) => set.has(g));
 }
+
+// 도감의 정렬·세대 필터 선택을 기억해서, 앱을 다시 열어도 직전에 보던 화면이
+// 그대로 나오게 한다. 저장된 값이 지금 코드가 아는 목록에 없으면(버전이 바뀐 뒤 등)
+// 기본값으로 되돌린다.
+const DEX_SORT_KEY = "pokemonDex.sort";
+const DEX_GENERATION_KEY = "pokemonDex.generation";
+
+function readPref(key, allowed, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return allowed.includes(saved) ? saved : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writePref(key, value) {
+  try {
+    if (value) localStorage.setItem(key, value);
+    else localStorage.removeItem(key);
+  } catch {
+    // localStorage 접근 불가 환경(시크릿 모드 등)에서는 조용히 무시
+  }
+}
+
+export function getDexSortPref() {
+  return readPref(DEX_SORT_KEY, Object.values(SORT_OPTIONS), SORT_OPTIONS.NAME_KO);
+}
+
+export function setDexSortPref(value) {
+  writePref(DEX_SORT_KEY, value);
+}
+
+export function getDexGenerationPref() {
+  return readPref(DEX_GENERATION_KEY, GENERATION_ORDER, null);
+}
+
+export function setDexGenerationPref(value) {
+  writePref(DEX_GENERATION_KEY, value);
+}

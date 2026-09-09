@@ -10,6 +10,10 @@ import {
   SORT_OPTIONS,
   TYPE_LABEL_KO,
   GENERATION_LABEL_KO,
+  getDexSortPref,
+  setDexSortPref,
+  getDexGenerationPref,
+  setDexGenerationPref,
 } from "../utils/pokemonData";
 import { matchesQuery } from "../utils/hangul";
 
@@ -18,9 +22,19 @@ export default function Dex() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState(SORT_OPTIONS.NAME_KO);
+  const [sortKey, setSortKeyState] = useState(getDexSortPref);
   const [typeFilter, setTypeFilter] = useState(null);
-  const [genFilter, setGenFilter] = useState(null);
+  const [genFilter, setGenFilterState] = useState(getDexGenerationPref);
+
+  const setSortKey = (value) => {
+    setSortKeyState(value);
+    setDexSortPref(value);
+  };
+
+  const setGenFilter = (value) => {
+    setGenFilterState(value);
+    setDexGenerationPref(value);
+  };
 
   useEffect(() => {
     loadPokemonData()
