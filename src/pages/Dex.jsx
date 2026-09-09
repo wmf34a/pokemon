@@ -6,8 +6,10 @@ import {
   loadPokemonData,
   sortPokemon,
   getAllTypes,
+  getAllGenerations,
   SORT_OPTIONS,
   TYPE_LABEL_KO,
+  GENERATION_LABEL_KO,
 } from "../utils/pokemonData";
 import { matchesQuery } from "../utils/hangul";
 
@@ -18,6 +20,7 @@ export default function Dex() {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState(SORT_OPTIONS.NAME_KO);
   const [typeFilter, setTypeFilter] = useState(null);
+  const [genFilter, setGenFilter] = useState(null);
 
   useEffect(() => {
     loadPokemonData()
@@ -27,12 +30,17 @@ export default function Dex() {
   }, []);
 
   const types = useMemo(() => getAllTypes(all), [all]);
+  const generations = useMemo(() => getAllGenerations(all), [all]);
+
+  // 세대 필터는 "세대순" 정렬일 때만 노출하므로, 다른 정렬로 옮기면 필터도 푼다.
+  const activeGen = sortKey === SORT_OPTIONS.GENERATION ? genFilter : null;
 
   const filtered = useMemo(() => {
     let list = all.filter((p) => matchesQuery(p.nameKo, query));
     if (typeFilter) list = list.filter((p) => p.types.includes(typeFilter));
+    if (activeGen) list = list.filter((p) => p.generation === activeGen);
     return sortPokemon(list, sortKey);
-  }, [all, query, sortKey, typeFilter]);
+  }, [all, query, sortKey, typeFilter, activeGen]);
 
   return (
     <AppShell title="포켓몬 도감" backTo="/">
@@ -63,6 +71,31 @@ export default function Dex() {
           </button>
         ))}
       </div>
+
+      {sortKey === SORT_OPTIONS.GENERATION && (
+        <div
+          className="no-scrollbar"
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: "var(--space-3)",
+            overflowX: "auto",
+          }}
+        >
+          <button onClick={() => setGenFilter(null)} style={pillStyle(!genFilter)}>
+            전체 세대
+          </button>
+          {generations.map((g) => (
+            <button
+              key={g}
+              onClick={() => setGenFilter(g)}
+              style={pillStyle(genFilter === g)}
+            >
+              {GENERATION_LABEL_KO[g] || g}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div
         className="no-scrollbar"

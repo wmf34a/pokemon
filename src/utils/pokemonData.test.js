@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   sortPokemon,
   getAllTypes,
+  getAllGenerations,
+  GENERATION_LABEL_KO,
   pickRandom,
   SORT_OPTIONS,
 } from "./pokemonData";
@@ -48,5 +50,17 @@ describe("pickRandom", () => {
   it("목록보다 많이 요청하면 목록 전체 길이만큼만 반환한다", () => {
     const picked = pickRandom(sample, 10);
     expect(picked).toHaveLength(sample.length);
+  });
+});
+
+describe("getAllGenerations", () => {
+  it("데이터에 있는 세대만 1세대→9세대 순서로 돌려준다", () => {
+    const list = [
+      { generation: "generation-iii" },
+      { generation: "generation-i" },
+      { generation: "generation-iii" },
+    ];
+    expect(getAllGenerations(list)).toEqual(["generation-i", "generation-iii"]);
+    expect(GENERATION_LABEL_KO["generation-iii"]).toBe("3세대");
   });
 });

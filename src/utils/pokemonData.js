@@ -123,3 +123,26 @@ export function applyGen1OnlyFilter(list) {
     ? list.filter((p) => p.generation === "generation-i")
     : list;
 }
+
+// 도감 "세대순" 정렬에서 쓰는 세대 필터. PokeAPI 의 generation-i ~ generation-ix
+// 문자열을 그대로 값으로 쓰고, 라벨만 한글로 보여준다.
+export const GENERATION_ORDER = [
+  "generation-i",
+  "generation-ii",
+  "generation-iii",
+  "generation-iv",
+  "generation-v",
+  "generation-vi",
+  "generation-vii",
+  "generation-viii",
+  "generation-ix",
+];
+
+export const GENERATION_LABEL_KO = Object.fromEntries(
+  GENERATION_ORDER.map((g, i) => [g, `${i + 1}세대`])
+);
+
+export function getAllGenerations(list) {
+  const set = new Set(list.map((p) => p.generation));
+  return GENERATION_ORDER.filter((g) => set.has(g));
+}
