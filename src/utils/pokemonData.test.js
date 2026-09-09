@@ -6,6 +6,8 @@ import {
   GENERATION_LABEL_KO,
   getDexSortPref,
   setDexSortPref,
+  getDexTypePref,
+  setDexTypePref,
   getDexGenerationPref,
   setDexGenerationPref,
   pickRandom,
@@ -98,5 +100,17 @@ describe("도감 정렬 저장", () => {
   it("모르는 값이 들어 있으면 기본값으로 되돌린다", () => {
     localStorage.setItem("pokemonDex.sort", "없는정렬");
     expect(getDexSortPref()).toBe(SORT_OPTIONS.NAME_KO);
+  });
+});
+
+describe("도감 타입 필터 저장", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("저장한 타입을 돌려주고, 모르는 값은 무시한다", () => {
+    expect(getDexTypePref()).toBe(null);
+    setDexTypePref("fire");
+    expect(getDexTypePref()).toBe("fire");
+    localStorage.setItem("pokemonDex.type", "없는타입");
+    expect(getDexTypePref()).toBe(null);
   });
 });

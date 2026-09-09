@@ -151,6 +151,7 @@ export function getAllGenerations(list) {
 // 그대로 나오게 한다. 저장된 값이 지금 코드가 아는 목록에 없으면(버전이 바뀐 뒤 등)
 // 기본값으로 되돌린다.
 const DEX_SORT_KEY = "pokemonDex.sort";
+const DEX_TYPE_KEY = "pokemonDex.type";
 const DEX_GENERATION_KEY = "pokemonDex.generation";
 
 function readPref(key, allowed, fallback) {
@@ -177,6 +178,14 @@ export function getDexSortPref() {
 
 export function setDexSortPref(value) {
   writePref(DEX_SORT_KEY, value);
+}
+
+export function getDexTypePref() {
+  return readPref(DEX_TYPE_KEY, Object.keys(TYPE_LABEL_KO), null);
+}
+
+export function setDexTypePref(value) {
+  writePref(DEX_TYPE_KEY, value);
 }
 
 export function getDexGenerationPref() {

@@ -12,6 +12,8 @@ import {
   GENERATION_LABEL_KO,
   getDexSortPref,
   setDexSortPref,
+  getDexTypePref,
+  setDexTypePref,
   getDexGenerationPref,
   setDexGenerationPref,
 } from "../utils/pokemonData";
@@ -23,12 +25,17 @@ export default function Dex() {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [sortKey, setSortKeyState] = useState(getDexSortPref);
-  const [typeFilter, setTypeFilter] = useState(null);
+  const [typeFilter, setTypeFilterState] = useState(getDexTypePref);
   const [genFilter, setGenFilterState] = useState(getDexGenerationPref);
 
   const setSortKey = (value) => {
     setSortKeyState(value);
     setDexSortPref(value);
+  };
+
+  const setTypeFilter = (value) => {
+    setTypeFilterState(value);
+    setDexTypePref(value);
   };
 
   const setGenFilter = (value) => {
