@@ -3,7 +3,6 @@ import {
   rollGrade,
   awardCard,
   getCards,
-  hasCard,
   awardCardOnQuizAnswer,
   QUIZ_CARD_DROP_RATE,
 } from "./cardCollection";
@@ -48,12 +47,6 @@ describe("awardCard", () => {
     expect(second).toEqual({ isNew: false, grade: "common" }); // 그대로 common 유지
   });
 
-  it("hasCard는 보유 여부를 정확히 반환한다", () => {
-    expect(hasCard(25)).toBe(false);
-    awardCard(25, () => 0);
-    expect(hasCard(25)).toBe(true);
-  });
-
   it("localStorage 접근이 실패해도 예외를 던지지 않고 등급을 반환한다", () => {
     const getSpy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("blocked");
@@ -71,13 +64,13 @@ describe("awardCardOnQuizAnswer", () => {
   it("난수가 QUIZ_CARD_DROP_RATE 미만이면 카드를 지급한다", () => {
     const result = awardCardOnQuizAnswer(25, () => 0);
     expect(result).toEqual({ isNew: true, grade: "common" });
-    expect(hasCard(25)).toBe(true);
+    expect(25 in getCards()).toBe(true);
   });
 
   it("난수가 QUIZ_CARD_DROP_RATE 이상이면 카드를 지급하지 않고 null을 반환한다", () => {
     const result = awardCardOnQuizAnswer(25, () => QUIZ_CARD_DROP_RATE);
     expect(result).toBeNull();
-    expect(hasCard(25)).toBe(false);
+    expect(25 in getCards()).toBe(false);
   });
 
   it("경계값 바로 아래는 지급, 정확히 경계값은 미지급이다", () => {

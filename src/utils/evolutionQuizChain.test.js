@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   getEvolutionQuizCandidates,
   buildEvolutionChain,
-  pickEvolutionQuizChain,
 } from "./evolutionQuizChain";
 
 const bulbasaur = { id: 1, nameKo: "이상해씨", evolvesTo: [{ id: 2, minLevel: 16 }] };
@@ -54,25 +53,5 @@ describe("buildEvolutionChain", () => {
   it("다음 단계 id가 데이터에 없으면(방어적) 지금까지 모은 체인에서 멈춘다", () => {
     const chain = buildEvolutionChain(brokenLink, all);
     expect(chain.map((p) => p.id)).toEqual([999]);
-  });
-});
-
-describe("pickEvolutionQuizChain", () => {
-  it("후보가 없으면 null을 반환한다", () => {
-    expect(pickEvolutionQuizChain([mewtwo, venusaur])).toBe(null);
-  });
-
-  it("체인이 2단계 미만으로만 만들어지면(방어적 상황) null을 반환한다", () => {
-    expect(pickEvolutionQuizChain([brokenLink])).toBe(null);
-  });
-
-  it("후보 중 하나를 골라 2~3단계짜리 체인을 반환한다", () => {
-    // brokenLink는 무작위로 뽑히면 항상 null이 나오는 방어적 케이스라(위 테스트에서
-    // 별도로 검증) 이 성공 경로 테스트에서는 제외해 결과가 항상 결정적이게 한다.
-    const validCandidates = [bulbasaur, ivysaur, venusaur, eevee, vaporeon, jolteon];
-    const chain = pickEvolutionQuizChain(validCandidates);
-    expect(chain).not.toBe(null);
-    expect(chain.length).toBeGreaterThanOrEqual(2);
-    expect(chain.length).toBeLessThanOrEqual(3);
   });
 });

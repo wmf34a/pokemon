@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppShell from "../components/AppShell";
 import TypeBadge from "../components/TypeBadge";
 import { loadPokemonData } from "../utils/pokemonData";
+import { pillStyle } from "../styles/tokens";
 import { getCards, GRADES, GRADE_LABEL_KO, GRADE_COLOR_VAR } from "../utils/cardCollection";
 
 // null = 전체, "owned" = 보유만, 그 외에는 GRADES 값 중 하나(해당 등급만)
@@ -10,20 +11,6 @@ const FILTERS = [
   { value: "owned", label: "보유만" },
   ...GRADES.map((g) => ({ value: g, label: GRADE_LABEL_KO[g] })),
 ];
-
-function pillStyle(active) {
-  return {
-    flexShrink: 0,
-    padding: "8px 16px",
-    minHeight: 36,
-    borderRadius: "var(--radius-pill)",
-    border: active ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
-    background: active ? "var(--color-primary)" : "var(--color-surface)",
-    color: active ? "var(--color-text-on-primary)" : "var(--color-text)",
-    fontSize: 13,
-    fontWeight: 600,
-  };
-}
 
 export default function CardCollection() {
   const [all, setAll] = useState([]);

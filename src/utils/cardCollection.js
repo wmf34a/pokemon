@@ -58,10 +58,6 @@ export function getCards() {
   return readCards();
 }
 
-export function hasCard(pokemonId) {
-  return Boolean(readCards()[pokemonId]);
-}
-
 export function awardCard(pokemonId, random = Math.random) {
   const cards = readCards();
   const existing = cards[pokemonId];

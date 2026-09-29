@@ -130,7 +130,7 @@ export function isMissionCompletedToday(missionId, now = new Date()) {
   return readLog().some((e) => e.missionId === missionId && e.date === today);
 }
 
-export function isAllMissionsCompletedToday(now = new Date()) {
+function isAllMissionsCompletedToday(now = new Date()) {
   const missions = getAllMissions(now);
   return missions.length > 0 && missions.every((m) => isMissionCompletedToday(m.id, now));
 }

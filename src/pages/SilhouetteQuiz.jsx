@@ -2,13 +2,15 @@ import { useEffect, useState, useCallback } from "react";
 import AppShell from "../components/AppShell";
 import AudioButton from "../components/AudioButton";
 import QuizResultScreen from "../components/QuizResultScreen";
-import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
+import { ResultHeading, HintLine } from "../components/QuizParts";
+import { LightbulbIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
   TYPE_LABEL_KO,
   applyGen1OnlyFilter,
   SESSION_LENGTH,
+  shuffle,
 } from "../utils/pokemonData";
 import { getChosung } from "../utils/hangul";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
@@ -264,35 +266,4 @@ export default function SilhouetteQuiz() {
       </div>
     </AppShell>
   );
-}
-
-function HintLine({ children }) {
-  return (
-    <p style={{ display: "flex", alignItems: "flex-start", gap: 6, textAlign: "left" }}>
-      <LightbulbIcon size={16} style={{ flexShrink: 0, marginTop: 2, color: "var(--color-text-muted)" }} />
-      <span>{children}</span>
-    </p>
-  );
-}
-
-function ResultHeading({ correct }) {
-  const Icon = correct ? CheckIcon : XCircleIcon;
-  return (
-    <h2
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        color: correct ? "var(--color-success)" : "var(--color-danger)",
-      }}
-    >
-      <Icon size={24} />
-      {correct ? "정답입니다!" : "아쉬워요!"}
-    </h2>
-  );
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
 }

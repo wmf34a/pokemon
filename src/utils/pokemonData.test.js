@@ -10,6 +10,8 @@ import {
   setDexTypePref,
   getDexGenerationPref,
   setDexGenerationPref,
+  getDexLegendaryPref,
+  setDexLegendaryPref,
   pickRandom,
   SORT_OPTIONS,
 } from "./pokemonData";
@@ -113,4 +115,17 @@ describe("도감 타입 필터 저장", () => {
     localStorage.setItem("pokemonDex.type", "없는타입");
     expect(getDexTypePref()).toBe(null);
   });
+});
+
+describe("도감 전설·환상 필터", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("켜고 끈 상태를 기억한다", () => {
+    expect(getDexLegendaryPref()).toBe(false);
+    setDexLegendaryPref(true);
+    expect(getDexLegendaryPref()).toBe(true);
+    setDexLegendaryPref(false);
+    expect(getDexLegendaryPref()).toBe(false);
+  });
+
 });

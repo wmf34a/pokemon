@@ -1,14 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import AppShell from "../components/AppShell";
 import QuizResultScreen from "../components/QuizResultScreen";
+import { ResultHeading } from "../components/QuizParts";
 import EvolutionToast from "../components/EvolutionToast";
 import CardToast from "../components/CardToast";
-import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
+import { LightbulbIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
   applyGen1OnlyFilter,
   SESSION_LENGTH,
+  shuffle,
 } from "../utils/pokemonData";
 import { buildHints } from "../utils/hintLadder";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
@@ -225,26 +227,4 @@ function HintLine({ children }) {
       <span>{children}</span>
     </p>
   );
-}
-
-function ResultHeading({ correct }) {
-  const Icon = correct ? CheckIcon : XCircleIcon;
-  return (
-    <h2
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        color: correct ? "var(--color-success)" : "var(--color-danger)",
-      }}
-    >
-      <Icon size={24} />
-      {correct ? "정답입니다!" : "아쉬워요!"}
-    </h2>
-  );
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
 }

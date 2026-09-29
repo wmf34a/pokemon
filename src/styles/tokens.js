@@ -71,6 +71,21 @@ export function pill(active) {
   };
 }
 
+// 도감·카드 모음·스타터 고르기의 정렬/필터 버튼.
+export function pillStyle(active) {
+  return {
+    flexShrink: 0,
+    padding: "8px 16px",
+    minHeight: 36,
+    borderRadius: "var(--radius-pill)",
+    border: active ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
+    background: active ? "var(--color-primary)" : "var(--color-surface)",
+    color: active ? "var(--color-text-on-primary)" : "var(--color-text)",
+    fontSize: 13,
+    fontWeight: 600,
+  };
+}
+
 export const evolutionToast = {
   display: "inline-flex",
   alignItems: "center",

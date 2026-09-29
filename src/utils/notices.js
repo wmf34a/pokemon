@@ -67,10 +67,6 @@ export function unreadNoticeCount() {
   return NOTICES.filter((n) => n.id > lastRead).length;
 }
 
-export function isUnread(notice) {
-  return notice.id > getLastReadId();
-}
-
 /*
  * 처음 한 번만 띄우는 안내.
  *

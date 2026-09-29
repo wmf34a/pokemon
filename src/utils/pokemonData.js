@@ -98,6 +98,10 @@ export function pickRandom(list, n = 1) {
   return out;
 }
 
+export function shuffle(list) {
+  return pickRandom(list, list.length);
+}
+
 // 퀴즈 문제 출제 범위를 1세대(#1~#151)로 제한하는 설정. localStorage에 저장해
 // 퀴즈 허브에서 켜고 끄면 이후 모든 퀴즈 모드에 반영되도록 함.
 const GEN1_ONLY_KEY = "pokemonQuiz.gen1Only";
@@ -126,7 +130,7 @@ export function applyGen1OnlyFilter(list) {
 
 // 도감 "세대순" 정렬에서 쓰는 세대 필터. PokeAPI 의 generation-i ~ generation-ix
 // 문자열을 그대로 값으로 쓰고, 라벨만 한글로 보여준다.
-export const GENERATION_ORDER = [
+const GENERATION_ORDER = [
   "generation-i",
   "generation-ii",
   "generation-iii",
@@ -153,6 +157,7 @@ export function getAllGenerations(list) {
 const DEX_SORT_KEY = "pokemonDex.sort";
 const DEX_TYPE_KEY = "pokemonDex.type";
 const DEX_GENERATION_KEY = "pokemonDex.generation";
+const DEX_LEGENDARY_KEY = "pokemonDex.legendary";
 
 function readPref(key, allowed, fallback) {
   try {
@@ -194,4 +199,13 @@ export function getDexGenerationPref() {
 
 export function setDexGenerationPref(value) {
   writePref(DEX_GENERATION_KEY, value);
+}
+
+// 전설·환상 필터는 켜고 끄는 토글이라 "1"만 저장하고, 끄면 키를 지운다.
+export function getDexLegendaryPref() {
+  return readPref(DEX_LEGENDARY_KEY, ["1"], null) === "1";
+}
+
+export function setDexLegendaryPref(on) {
+  writePref(DEX_LEGENDARY_KEY, on ? "1" : null);
 }

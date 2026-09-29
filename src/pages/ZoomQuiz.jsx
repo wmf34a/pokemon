@@ -2,12 +2,14 @@ import { useEffect, useState, useCallback } from "react";
 import AppShell from "../components/AppShell";
 import AudioButton from "../components/AudioButton";
 import QuizResultScreen from "../components/QuizResultScreen";
-import { LightbulbIcon, CheckIcon, XCircleIcon } from "../components/Icons";
+import { ResultHeading } from "../components/QuizParts";
+import { LightbulbIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
   applyGen1OnlyFilter,
   SESSION_LENGTH,
+  shuffle,
 } from "../utils/pokemonData";
 import { primaryBtn, hintBtn, choiceBtn, textInput, pill } from "../styles/tokens";
 import { useAwardPoints } from "../hooks/useMyPokemonPoints";
@@ -258,26 +260,4 @@ export default function ZoomQuiz() {
       </div>
     </AppShell>
   );
-}
-
-function ResultHeading({ correct }) {
-  const Icon = correct ? CheckIcon : XCircleIcon;
-  return (
-    <h2
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        color: correct ? "var(--color-success)" : "var(--color-danger)",
-      }}
-    >
-      <Icon size={24} />
-      {correct ? "정답입니다!" : "아쉬워요!"}
-    </h2>
-  );
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
 }

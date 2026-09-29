@@ -33,13 +33,3 @@ export function buildEvolutionChain(startPokemon, allPokemon) {
   }
   return chain;
 }
-
-// 후보 중 하나를 무작위로 골라 정답 순서 체인을 만든다.
-// 후보가 없거나(데이터 누락) 체인이 2단계 미만으로만 만들어지면(방어적 상황) null.
-export function pickEvolutionQuizChain(allPokemon) {
-  const candidates = getEvolutionQuizCandidates(allPokemon);
-  if (candidates.length === 0) return null;
-  const start = candidates[Math.floor(Math.random() * candidates.length)];
-  const chain = buildEvolutionChain(start, allPokemon);
-  return chain.length >= 2 ? chain : null;
-}

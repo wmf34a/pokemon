@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export function TopBar({ title, backTo, bare = false }) {
+function TopBar({ title, backTo, bare = false }) {
   // 경로가 바뀌면 이 줄 때문에 다시 그려지고, 그때 새로 센다.
   // 알림을 읽고 나왔는데 빨간 점이 남아 있으면 안 된다
   useLocation();

@@ -9,6 +9,7 @@ import {
   TYPE_LABEL_KO,
   TYPE_COLOR,
 } from "../utils/pokemonData";
+import { pillStyle } from "../styles/tokens";
 import { matchesQuery } from "../utils/hangul";
 import { getStarterCandidates, chooseStarter } from "../utils/myPokemon";
 import { resetCareState } from "../utils/pokemonCare";
@@ -256,18 +257,4 @@ function StarterCard({ p, onPick }) {
       </div>
     </button>
   );
-}
-
-function pillStyle(active) {
-  return {
-    flexShrink: 0,
-    padding: "8px 16px",
-    minHeight: 36,
-    borderRadius: "var(--radius-pill)",
-    border: active ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
-    background: active ? "var(--color-primary)" : "var(--color-surface)",
-    color: active ? "var(--color-text-on-primary)" : "var(--color-text)",
-    fontSize: 13,
-    fontWeight: 600,
-  };
 }

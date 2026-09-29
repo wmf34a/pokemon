@@ -16,7 +16,10 @@ import {
   setDexTypePref,
   getDexGenerationPref,
   setDexGenerationPref,
+  getDexLegendaryPref,
+  setDexLegendaryPref,
 } from "../utils/pokemonData";
+import { pillStyle } from "../styles/tokens";
 import { matchesQuery } from "../utils/hangul";
 
 export default function Dex() {
@@ -27,6 +30,7 @@ export default function Dex() {
   const [sortKey, setSortKeyState] = useState(getDexSortPref);
   const [typeFilter, setTypeFilterState] = useState(getDexTypePref);
   const [genFilter, setGenFilterState] = useState(getDexGenerationPref);
+  const [legendaryOnly, setLegendaryOnlyState] = useState(getDexLegendaryPref);
 
   const setSortKey = (value) => {
     setSortKeyState(value);
@@ -41,6 +45,11 @@ export default function Dex() {
   const setGenFilter = (value) => {
     setGenFilterState(value);
     setDexGenerationPref(value);
+  };
+
+  const toggleLegendaryOnly = () => {
+    setLegendaryOnlyState(!legendaryOnly);
+    setDexLegendaryPref(!legendaryOnly);
   };
 
   useEffect(() => {
@@ -60,8 +69,9 @@ export default function Dex() {
     let list = all.filter((p) => matchesQuery(p.nameKo, query));
     if (typeFilter) list = list.filter((p) => p.types.includes(typeFilter));
     if (activeGen) list = list.filter((p) => p.generation === activeGen);
+    if (legendaryOnly) list = list.filter((p) => p.isLegendary || p.isMythical);
     return sortPokemon(list, sortKey);
-  }, [all, query, sortKey, typeFilter, activeGen]);
+  }, [all, query, sortKey, typeFilter, activeGen, legendaryOnly]);
 
   return (
     <AppShell title="포켓몬 도감" backTo="/">
@@ -127,6 +137,13 @@ export default function Dex() {
           overflowX: "auto",
         }}
       >
+        <button
+          onClick={toggleLegendaryOnly}
+          aria-pressed={legendaryOnly}
+          style={pillStyle(legendaryOnly)}
+        >
+          전설·환상
+        </button>
         <button onClick={() => setTypeFilter(null)} style={pillStyle(!typeFilter)}>
           전체
         </button>
@@ -178,18 +195,4 @@ export default function Dex() {
       )}
     </AppShell>
   );
-}
-
-function pillStyle(active) {
-  return {
-    flexShrink: 0,
-    padding: "8px 16px",
-    minHeight: 36,
-    borderRadius: "var(--radius-pill)",
-    border: active ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
-    background: active ? "var(--color-primary)" : "var(--color-surface)",
-    color: active ? "var(--color-text-on-primary)" : "var(--color-text)",
-    fontSize: 13,
-    fontWeight: 600,
-  };
 }

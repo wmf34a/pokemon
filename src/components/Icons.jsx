@@ -138,14 +138,6 @@ export function ShuffleIcon(props) {
   );
 }
 
-export function HashIcon(props) {
-  return (
-    <Base {...props}>
-      <path d="M9 3 7 21M17 3l-2 18M4 8.5h16M3.5 15.5h16" />
-    </Base>
-  );
-}
-
 export function PlayIcon(props) {
   return (
     <Base {...props}>
@@ -176,36 +168,6 @@ export function XCircleIcon(props) {
     <Base {...props}>
       <circle cx="12" cy="12" r="8.5" />
       <path d="m9 9 6 6M15 9l-6 6" />
-    </Base>
-  );
-}
-
-export function PaletteIcon(props) {
-  return (
-    <Base {...props}>
-      <path d="M12 3.5a8.5 8 0 1 0 0 16c1.1 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.4-.5-.8-.5-1.3 0-.9.7-1.6 1.6-1.6H16a4.5 4 0 0 0 4.5-4C20.5 6 16.7 3.5 12 3.5Z" />
-      <circle cx="8" cy="11" r="1" fill="currentColor" stroke="none" />
-      <circle cx="11" cy="8" r="1" fill="currentColor" stroke="none" />
-      <circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none" />
-    </Base>
-  );
-}
-
-export function GlobeIcon(props) {
-  return (
-    <Base {...props}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.1 3.3 8.5S14.2 18.2 12 20.5C9.8 18.2 8.7 15.4 8.7 12S9.8 5.8 12 3.5Z" />
-    </Base>
-  );
-}
-
-export function TrophyIcon(props) {
-  return (
-    <Base {...props}>
-      <path d="M8 4.5h8v5a4 4 0 0 1-8 0z" />
-      <path d="M8 5.5H5.5a2.5 2.5 0 0 0 2.5 3.5M16 5.5h2.5a2.5 2.5 0 0 1-2.5 3.5" />
-      <path d="M12 13.5v3M9 20h6M9.5 20c-.3-1.2-.3-2 0-3h5c.3 1 .3 1.8 0 3" />
     </Base>
   );
 }
@@ -246,14 +208,6 @@ export function LayersIcon(props) {
     <Base {...props}>
       <path d="M12 3.5 4 8l8 4.5L20 8z" />
       <path d="M4 12.5 12 17l8-4.5M4 16.5 12 21l8-4.5" />
-    </Base>
-  );
-}
-
-export function HeartIcon(props) {
-  return (
-    <Base {...props}>
-      <path d="M12 20.5 4.5 13a5 5 0 0 1 7.5-6.6 5 5 0 0 1 7.5 6.6z" />
     </Base>
   );
 }
