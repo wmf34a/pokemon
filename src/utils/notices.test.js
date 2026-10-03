@@ -4,6 +4,7 @@ import {
   getLastReadId,
   markAllNoticesRead,
   unreadNoticeCount,
+  getUnreadNotices,
   hasSeenTour,
   markTourSeen,
 } from "./notices";
@@ -77,5 +78,25 @@ describe("처음 한 번만 뜨는 안내", () => {
     };
     expect(hasSeenTour()).toBe(true);
     Object.defineProperty(Storage.prototype, "getItem", original);
+  });
+});
+
+describe("getUnreadNotices", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("처음 온 사람에게는 전부 새 소식이다", () => {
+    expect(getUnreadNotices()).toHaveLength(NOTICES.length);
+  });
+
+  it("읽음 처리한 뒤에는 비어 있다", () => {
+    markAllNoticesRead();
+    expect(getUnreadNotices()).toEqual([]);
+  });
+
+  it("마지막으로 읽은 번호보다 큰 것만 돌려준다", () => {
+    const newest = NOTICES.reduce((max, n) => Math.max(max, n.id), 0);
+    localStorage.setItem("pokemonQuiz.noticeRead", String(newest - 1));
+    const unread = getUnreadNotices();
+    expect(unread.map((n) => n.id)).toEqual([newest]);
   });
 });

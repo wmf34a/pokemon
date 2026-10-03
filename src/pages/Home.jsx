@@ -14,12 +14,21 @@ import { getCareState, getMoodLevel, isAnyActionReady, MOOD_LABEL_KO, MOOD_FILTE
 import { getAllMissions, getTodayCompletedCount } from "../utils/dailyMission";
 import { ClipboardCheckIcon } from "../components/Icons";
 import WhatsNewDialog from "../components/WhatsNewDialog";
-import { hasSeenTour, markTourSeen } from "../utils/notices";
+import NoticeSheet from "../components/NoticeSheet";
+import {
+  hasSeenTour,
+  markTourSeen,
+  markAllNoticesRead,
+  getUnreadNotices,
+} from "../utils/notices";
 
 export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
   // 새로 생긴 것 안내. 딱 한 번만 뜬다
   const [showTour, setShowTour] = useState(() => !hasSeenTour());
+  // 새 소식 바텀시트. 처음 온 사람에게는 안 띄운다 — 그 사람에겐 지난 소식
+  // 전부가 "새 소식"이라 시트가 길어진다. 첫 방문은 위의 투어가 맡는다
+  const [newNotices, setNewNotices] = useState(() => (hasSeenTour() ? getUnreadNotices() : []));
   const dailyPokemon = useDailyPokemon();
   const [all, setAll] = useState([]);
   const [missionTotals, setMissionTotals] = useState(null);
@@ -200,12 +209,20 @@ export default function Home() {
 
   function closeTour() {
     markTourSeen();
+    // 투어를 본 사람에게 다음 실행 때 지난 소식 전부를 시트로 또 보여주지 않는다
+    markAllNoticesRead();
     setShowTour(false);
+  }
+
+  function closeNotices() {
+    markAllNoticesRead();
+    setNewNotices([]);
   }
 
   return (
     <AppShell title={undefined}>
       <WhatsNewDialog open={showTour} onClose={closeTour} />
+      {!showTour && <NoticeSheet notices={newNotices} onClose={closeNotices} />}
 
       <div style={{ padding: "var(--space-4) 0 var(--space-2)" }}>
         <img

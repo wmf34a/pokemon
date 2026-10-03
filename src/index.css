@@ -335,3 +335,19 @@ img {
     animation: care-idle-bob 2.4s ease-in-out infinite;
   }
 }
+
+/* 새 소식 바텀시트: 밑에서 한 번 올라온다 */
+@keyframes notice-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .notice-sheet {
+    animation: notice-sheet-up 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}

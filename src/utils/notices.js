@@ -10,6 +10,12 @@
  */
 export const NOTICES = [
   {
+    id: 6,
+    date: "2026-10-03",
+    title: "진화하지 않는 포켓몬도 파트너로 고를 수 있어요",
+    body: "루차불, 라프라스, 메타몽처럼 진화가 없는 포켓몬 117마리가 파트너 목록에 새로 들어왔어요. 고를 수 있는 포켓몬이 340마리에서 457마리가 됐어요. 진화하지 않는 포켓몬은 이름 옆에 ⊘ 표시가 붙어요.",
+  },
+  {
     id: 5,
     date: "2026-09-09",
     title: "도감에서 세대별로 골라 볼 수 있어요",
@@ -62,9 +68,14 @@ export function markAllNoticesRead() {
   }
 }
 
-export function unreadNoticeCount() {
+/** 아직 안 읽은 소식. 최신이 앞에 온다 (NOTICES 자체가 내림차순이다) */
+export function getUnreadNotices() {
   const lastRead = getLastReadId();
-  return NOTICES.filter((n) => n.id > lastRead).length;
+  return NOTICES.filter((n) => n.id > lastRead);
+}
+
+export function unreadNoticeCount() {
+  return getUnreadNotices().length;
 }
 
 /*
