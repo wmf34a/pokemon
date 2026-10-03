@@ -26,9 +26,10 @@ export default function Home() {
   const [mine, setMine] = useState(undefined); // undefined=확인 전, null=없음, 객체=있음
   // 새로 생긴 것 안내. 딱 한 번만 뜬다
   const [showTour, setShowTour] = useState(() => !hasSeenTour());
-  // 새 소식 바텀시트. 처음 온 사람에게는 안 띄운다 — 그 사람에겐 지난 소식
-  // 전부가 "새 소식"이라 시트가 길어진다. 첫 방문은 위의 투어가 맡는다
-  const [newNotices, setNewNotices] = useState(() => (hasSeenTour() ? getUnreadNotices() : []));
+  // 새 소식 바텀시트. 처음 온 사람에게도 지난 소식을 전부 띄운다 —
+  // 서버가 없어 푸시를 못 보내니, 앱을 연 그 순간이 알릴 수 있는 유일한 때다.
+  // 첫 방문은 투어가 먼저 뜨고, 그 투어를 닫으면 이어서 시트가 올라온다
+  const [newNotices, setNewNotices] = useState(getUnreadNotices);
   const dailyPokemon = useDailyPokemon();
   const [all, setAll] = useState([]);
   const [missionTotals, setMissionTotals] = useState(null);
@@ -209,9 +210,9 @@ export default function Home() {
 
   function closeTour() {
     markTourSeen();
-    // 투어를 본 사람에게 다음 실행 때 지난 소식 전부를 시트로 또 보여주지 않는다
-    markAllNoticesRead();
     setShowTour(false);
+    // 읽음 처리는 하지 않는다. 투어를 닫으면 소식 시트가 이어서 올라오고,
+    // 거기서 "확인했어요" 를 눌러야 읽은 것으로 친다
   }
 
   function closeNotices() {

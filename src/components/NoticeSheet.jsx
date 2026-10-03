@@ -6,8 +6,9 @@ import { Link } from "react-router-dom";
  * 종 아이콘의 빨간 점만으로는 아무도 안 눌러 본다. 서버가 없어 푸시를 못 보내니,
  * 앱을 열었을 때 밑에서 올라오는 시트로 한 번 알려주고 읽음 처리한다.
  *
- * **처음 온 사람에게는 띄우지 않는다.** 그 사람에겐 지난 소식 전부가 "새 소식"이라
- * 여섯 개짜리 시트가 뜬다. 첫 방문은 `WhatsNewDialog` 가 맡는다(Home 에서 가른다).
+ * **처음 온 사람에게도 지난 소식을 전부 띄운다.** 앱을 연 그 순간이 알릴 수 있는
+ * 유일한 때다. 첫 방문은 `WhatsNewDialog` 투어가 먼저 뜨고, 닫으면 이 시트가 이어진다.
+ * 그래서 목록이 길어질 수 있어 `maxHeight: 80vh` 안에서 스크롤한다.
  *
  * 가운데 팝업이 아니라 아래에서 올라오게 둔 이유는 한 손으로 잡은 폰에서
  * 닫기 버튼이 엄지에 닿아야 하기 때문이다.
@@ -39,7 +40,10 @@ export default function NoticeSheet({ notices, onClose }) {
           width: "100%",
           maxWidth: 420,
           maxHeight: "80vh",
-          overflowY: "auto",
+          // 소식이 여러 개면 목록만 구르고 버튼은 제자리에 있어야 한다.
+          // 시트 전체를 구르게 두면 "확인했어요" 가 화면 밖으로 밀린다
+          display: "flex",
+          flexDirection: "column",
           borderRadius: "var(--radius-lg) var(--radius-lg) 0 0",
           background: "var(--color-surface)",
           boxShadow: "var(--shadow-card)",
@@ -68,7 +72,7 @@ export default function NoticeSheet({ notices, onClose }) {
           {notices.length === 1 ? "새 소식이 있어요" : `새 소식 ${notices.length}개가 있어요`}
         </h3>
 
-        <div style={{ display: "grid", gap: 14, margin: "var(--space-4) 0" }}>
+        <div style={{ display: "grid", gap: 14, margin: "var(--space-4) 0", overflowY: "auto" }}>
           {notices.map((n) => (
             <div key={n.id}>
               <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{n.date}</div>
