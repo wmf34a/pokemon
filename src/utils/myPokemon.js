@@ -95,12 +95,26 @@ export function chooseStarter(pokemon, nickname) {
   return writeRecord(record);
 }
 
-// 스타터로 고를 수 있는 후보: 1단계이면서 진화 가능한(evolvesTo가 있는) 포켓몬.
-// 전설/신화 포켓몬은 대부분 진화가 없어 이 조건만으로 자연히 제외된다.
+// 스타터로 고를 수 있는 후보: 1단계이면서, 진화를 하거나 전설·신화가 아닌 포켓몬.
+//
+// 진화가 없는 포켓몬(루차불, 라프라스, 메타몽 등 117마리)도 고를 수 있다. 예전엔
+// evolvesTo 가 있어야만 후보였는데, 아이가 아는 포켓몬이 목록에 없는 이유를 화면이
+// 설명해 주지 않아 "없어졌다"는 제보로 돌아왔다. 대신 고를 때 진화하지 않는다고
+// 분명히 알린다 (isNonEvolving + ChooseStarter 의 안내 문구).
+//
+// 전설·신화라도 진화하는 쪽(피오네·타입:널·코스모그·치고마)은 예전부터 고를 수 있었으므로
+// 그대로 둔다 — 조건을 "전설이 아닐 것" 하나로 바꾸면 이 넷이 조용히 사라진다.
 export function getStarterCandidates(allPokemon) {
   return allPokemon.filter(
-    (p) => p.evolutionStage === 1 && p.evolvesTo?.length > 0
+    (p) =>
+      p.evolutionStage === 1 &&
+      (p.evolvesTo?.length > 0 || !(p.isLegendary || p.isMythical))
   );
+}
+
+// 이 포켓몬은 아무리 포인트를 모아도 모습이 바뀌지 않는다.
+export function isNonEvolving(pokemon) {
+  return !(pokemon?.evolvesTo?.length > 0);
 }
 
 // 퀴즈 정답으로 얻은 포인트를 "내 포켓몬"에 적립한다.

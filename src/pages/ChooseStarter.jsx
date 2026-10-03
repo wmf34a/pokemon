@@ -10,8 +10,8 @@ import {
   TYPE_COLOR,
 } from "../utils/pokemonData";
 import { pillStyle } from "../styles/tokens";
-import { matchesQuery } from "../utils/hangul";
-import { getStarterCandidates, chooseStarter } from "../utils/myPokemon";
+import { matchesQuery, josa } from "../utils/hangul";
+import { getStarterCandidates, chooseStarter, isNonEvolving } from "../utils/myPokemon";
 import { resetCareState } from "../utils/pokemonCare";
 
 export default function ChooseStarter() {
@@ -92,6 +92,24 @@ export default function ChooseStarter() {
               boxSizing: "border-box",
             }}
           />
+
+          {isNonEvolving(picked) && (
+            <p
+              style={{
+                marginTop: "var(--space-4)",
+                padding: "12px 14px",
+                borderRadius: "var(--radius-md)",
+                background: "var(--color-surface-2)",
+                color: "var(--color-text-muted)",
+                fontSize: 13,
+                lineHeight: 1.5,
+                textAlign: "left",
+              }}
+            >
+              {picked.nameKo}{josa(picked.nameKo, "은", "는")} <b>진화하지 않아요.</b> 퀴즈로 포인트를 모아도 모습이
+              그대로예요. 밥 주기·놀아주기는 똑같이 할 수 있어요.
+            </p>
+          )}
 
           <button
             type="button"
@@ -184,7 +202,7 @@ export default function ChooseStarter() {
       ) : (
         <>
           <p style={{ color: "var(--color-text-muted)", fontSize: 13 }}>
-            {filtered.length}마리 중에서 골라보세요
+            {filtered.length}마리 중에서 골라보세요 · <span style={{ color: "var(--color-text-muted)" }}>⊘</span> 표시는 진화하지 않는 포켓몬이에요
           </p>
           <div
             style={{
@@ -249,7 +267,17 @@ function StarterCard({ p, onPick }) {
       <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 8 }}>
         #{String(p.id).padStart(4, "0")}
       </div>
-      <div style={{ fontWeight: 700, fontSize: 15 }}>{p.nameKo}</div>
+      <div style={{ fontWeight: 700, fontSize: 15 }}>
+        {p.nameKo}
+        {isNonEvolving(p) && (
+          <span
+            title="진화하지 않아요"
+            style={{ marginLeft: 4, fontSize: 12, color: "var(--color-text-muted)" }}
+          >
+            ⊘
+          </span>
+        )}
+      </div>
       <div style={{ marginTop: 6 }}>
         {p.types.map((t) => (
           <TypeBadge key={t} type={t} />

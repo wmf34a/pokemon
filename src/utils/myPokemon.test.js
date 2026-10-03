@@ -3,6 +3,7 @@ import {
   getMyPokemon,
   chooseStarter,
   getStarterCandidates,
+  isNonEvolving,
   addPoints,
   resolveBranchEvolution,
   clearPendingEvolution,
@@ -30,6 +31,7 @@ const mewtwo = {
   nameKo: "뮤츠",
   evolutionStage: 1,
   evolvesTo: [],
+  isLegendary: true,
 };
 
 const ivysaur = {
@@ -120,10 +122,35 @@ describe("chooseStarter", () => {
 });
 
 describe("getStarterCandidates", () => {
-  it("evolutionStage가 1이고 evolvesTo가 있는 포켓몬만 후보로 반환한다", () => {
+  it("evolutionStage가 1이면 진화 없는 전설·신화만 빼고 후보로 반환한다", () => {
     const all = [bulbasaur, pikachu, mewtwo, ivysaur];
     const candidates = getStarterCandidates(all);
     expect(candidates.map((p) => p.id)).toEqual([1, 25]);
+  });
+
+  it("진화가 없어도 전설·신화가 아니면 후보에 넣는다 (루차불 제보)", () => {
+    const hawlucha = { id: 701, nameKo: "루차불", evolutionStage: 1, evolvesTo: [] };
+    expect(getStarterCandidates([hawlucha]).map((p) => p.id)).toEqual([701]);
+  });
+
+  it("전설·신화라도 진화하면 후보에 남긴다 (코스모그)", () => {
+    const cosmog = {
+      id: 789,
+      nameKo: "코스모그",
+      evolutionStage: 1,
+      evolvesTo: [{ id: 790, minLevel: 43 }],
+      isLegendary: true,
+    };
+    expect(getStarterCandidates([cosmog]).map((p) => p.id)).toEqual([789]);
+  });
+});
+
+describe("isNonEvolving", () => {
+  it("evolvesTo가 비어 있으면 진화하지 않는 포켓몬이다", () => {
+    expect(isNonEvolving({ evolvesTo: [] })).toBe(true);
+    expect(isNonEvolving({})).toBe(true);
+    expect(isNonEvolving(null)).toBe(true);
+    expect(isNonEvolving({ evolvesTo: [2] })).toBe(false);
   });
 });
 
