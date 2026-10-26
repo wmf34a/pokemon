@@ -8,7 +8,7 @@ import CardToast from "../components/CardToast";
 import {
   loadPokemonData,
   pickRandom,
-  applyGen1OnlyFilter,
+  applyQuizGenerationFilter,
   SESSION_LENGTH,
   shuffle,
 } from "../utils/pokemonData";
@@ -39,7 +39,7 @@ export default function TypeQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(applyGen1OnlyFilter(data));
+      setAll(applyQuizGenerationFilter(data));
     });
   }, []);
 

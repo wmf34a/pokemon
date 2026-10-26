@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppShell from "../components/AppShell";
-import { getGen1OnlyPref, setGen1OnlyPref } from "../utils/pokemonData";
+import {
+  GENERATION_ORDER,
+  getQuizGenerationsPref,
+  setQuizGenerationsPref,
+} from "../utils/pokemonData";
+import { pillStyle } from "../styles/tokens";
 import {
   GlassesIcon,
   VolumeIcon,
@@ -73,87 +78,73 @@ function ModeGrid({ modes }) {
   );
 }
 
-export default function QuizHub() {
-  const [gen1Only, setGen1Only] = useState(() => getGen1OnlyPref());
+// 고른 세대를 "2·3세대 포켓몬만 출제"처럼 한 줄로 보여준다. 비어 있으면 전체.
+function selectionSummary(selected) {
+  if (selected.length === 0) return "전체 포켓몬에서 출제";
+  const nums = selected.map((g) => GENERATION_ORDER.indexOf(g) + 1);
+  return `${nums.join("·")}세대 포켓몬만 출제`;
+}
 
-  function toggleGen1Only(e) {
-    const checked = e.target.checked;
-    setGen1Only(checked);
-    setGen1OnlyPref(checked);
+export default function QuizHub() {
+  const [selected, setSelected] = useState(() => getQuizGenerationsPref());
+
+  function update(next) {
+    setQuizGenerationsPref(next);
+    // 저장 쪽에서 세대 순서로 정리하므로 화면도 같은 값을 다시 읽어 맞춘다
+    setSelected(getQuizGenerationsPref());
   }
+
+  function toggleGeneration(g) {
+    update(selected.includes(g) ? selected.filter((x) => x !== g) : [...selected, g]);
+  }
+
+  const filtered = selected.length > 0;
 
   return (
     <AppShell title="퀴즈 모드 선택" backTo="/">
-      <label
+      <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
           padding: "var(--space-4) var(--space-5)",
           borderRadius: "var(--radius-lg)",
-          border: gen1Only ? "2px solid var(--color-primary)" : "2px solid var(--color-border)",
-          background: gen1Only
+          border: filtered ? "2px solid var(--color-primary)" : "2px solid var(--color-border)",
+          background: filtered
             ? "color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))"
             : "var(--color-surface)",
           marginBottom: "var(--space-5)",
         }}
       >
-        <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <img
             src={`${import.meta.env.BASE_URL}pokeball.svg`}
             alt=""
             style={{ width: 32, height: 32, flexShrink: 0 }}
           />
-          <span>
+          <div>
             <div style={{ fontWeight: 800, fontSize: 16, color: "var(--color-primary)" }}>
-              1세대 포켓몬만 출제
+              출제할 세대 고르기
             </div>
             <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 2 }}>
-              #001 ~ #151 (총 151마리)
+              {selectionSummary(selected)}
             </div>
-          </span>
-        </span>
+          </div>
+        </div>
 
-        <span style={{ position: "relative", width: 52, height: 30, flexShrink: 0 }}>
-          <input
-            type="checkbox"
-            checked={gen1Only}
-            onChange={toggleGen1Only}
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              margin: 0,
-              opacity: 0,
-              zIndex: 1,
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "var(--radius-pill)",
-              background: gen1Only ? "var(--color-primary)" : "var(--color-border)",
-              transition: "background 150ms ease",
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              top: 3,
-              left: gen1Only ? 25 : 3,
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "#fff",
-              boxShadow: "0 1px 4px rgba(0,0,0,.35)",
-              transition: "left 150ms ease",
-            }}
-          />
-        </span>
-      </label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: "var(--space-3)" }}>
+          <button onClick={() => update([])} aria-pressed={!filtered} style={pillStyle(!filtered)}>
+            전체 세대
+          </button>
+          {GENERATION_ORDER.map((g, i) => (
+            <button
+              key={g}
+              onClick={() => toggleGeneration(g)}
+              aria-pressed={selected.includes(g)}
+              style={pillStyle(selected.includes(g))}
+            >
+              {i + 1}세대
+            </button>
+          ))}
+        </div>
+      </div>
 
       <ModeGrid modes={MODES} />
 

@@ -8,7 +8,7 @@ import {
   loadPokemonData,
   pickRandom,
   TYPE_LABEL_KO,
-  applyGen1OnlyFilter,
+  applyQuizGenerationFilter,
   SESSION_LENGTH,
   shuffle,
 } from "../utils/pokemonData";
@@ -46,7 +46,7 @@ export default function SilhouetteQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(applyGen1OnlyFilter(data));
+      setAll(applyQuizGenerationFilter(data));
     });
   }, []);
 

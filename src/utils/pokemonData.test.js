@@ -12,6 +12,9 @@ import {
   setDexGenerationPref,
   getDexLegendaryPref,
   setDexLegendaryPref,
+  getQuizGenerationsPref,
+  setQuizGenerationsPref,
+  applyQuizGenerationFilter,
   pickRandom,
   SORT_OPTIONS,
 } from "./pokemonData";
@@ -128,4 +131,48 @@ describe("도감 전설·환상 필터", () => {
     expect(getDexLegendaryPref()).toBe(false);
   });
 
+});
+
+describe("퀴즈 출제 세대 설정", () => {
+  beforeEach(() => localStorage.clear());
+
+  const list = [
+    { id: 1, generation: "generation-i" },
+    { id: 152, generation: "generation-ii" },
+    { id: 252, generation: "generation-iii" },
+  ];
+
+  it("아무것도 고르지 않았으면 전체 포켓몬을 그대로 낸다", () => {
+    expect(getQuizGenerationsPref()).toEqual([]);
+    expect(applyQuizGenerationFilter(list)).toEqual(list);
+  });
+
+  it("고른 세대(여러 개 가능)의 포켓몬만 낸다", () => {
+    setQuizGenerationsPref(["generation-ii", "generation-iii"]);
+    expect(getQuizGenerationsPref()).toEqual(["generation-ii", "generation-iii"]);
+    expect(applyQuizGenerationFilter(list).map((p) => p.id)).toEqual([152, 252]);
+  });
+
+  it("모르는 세대 값과 중복은 버리고 세대 순서로 저장한다", () => {
+    setQuizGenerationsPref(["generation-iii", "generation-xxx", "generation-i", "generation-iii"]);
+    expect(getQuizGenerationsPref()).toEqual(["generation-i", "generation-iii"]);
+  });
+
+  it("빈 배열을 저장하면 전체로 돌아간다", () => {
+    setQuizGenerationsPref(["generation-i"]);
+    setQuizGenerationsPref([]);
+    expect(getQuizGenerationsPref()).toEqual([]);
+  });
+
+  it("예전 '1세대만' 설정을 쓰던 사람은 1세대 선택으로 이어받는다", () => {
+    localStorage.setItem("pokemonQuiz.gen1Only", "1");
+    expect(getQuizGenerationsPref()).toEqual(["generation-i"]);
+    expect(applyQuizGenerationFilter(list).map((p) => p.id)).toEqual([1]);
+  });
+
+  it("새 설정을 저장하면 예전 설정은 더 이상 영향을 주지 않는다", () => {
+    localStorage.setItem("pokemonQuiz.gen1Only", "1");
+    setQuizGenerationsPref([]);
+    expect(getQuizGenerationsPref()).toEqual([]);
+  });
 });

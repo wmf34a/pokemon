@@ -7,7 +7,7 @@ import { LightbulbIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
-  applyGen1OnlyFilter,
+  applyQuizGenerationFilter,
   SESSION_LENGTH,
   shuffle,
 } from "../utils/pokemonData";
@@ -48,7 +48,7 @@ export default function ZoomQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(applyGen1OnlyFilter(data));
+      setAll(applyQuizGenerationFilter(data));
     });
   }, []);
 

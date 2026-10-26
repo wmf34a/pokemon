@@ -1,5 +1,5 @@
 // "내 포켓몬" 선택/현재 상태를 localStorage에 저장하는 모듈.
-// pokemonData.js의 getGen1OnlyPref/setGen1OnlyPref와 동일하게, localStorage 접근
+// pokemonData.js의 getQuizGenerationsPref/setQuizGenerationsPref와 동일하게, localStorage 접근
 // 실패(시크릿 모드 등)나 저장된 값이 손상된 경우 모두 조용히 안전한 기본값으로 처리한다.
 //
 // 레코드 형태 (localStorage key: "pokemonMine.v1"):

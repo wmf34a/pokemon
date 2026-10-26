@@ -102,35 +102,9 @@ export function shuffle(list) {
   return pickRandom(list, list.length);
 }
 
-// 퀴즈 문제 출제 범위를 1세대(#1~#151)로 제한하는 설정. localStorage에 저장해
-// 퀴즈 허브에서 켜고 끄면 이후 모든 퀴즈 모드에 반영되도록 함.
-const GEN1_ONLY_KEY = "pokemonQuiz.gen1Only";
-
-export function getGen1OnlyPref() {
-  try {
-    return localStorage.getItem(GEN1_ONLY_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-export function setGen1OnlyPref(value) {
-  try {
-    localStorage.setItem(GEN1_ONLY_KEY, value ? "1" : "0");
-  } catch {
-    // localStorage 접근 불가 환경(시크릿 모드 등)에서는 조용히 무시
-  }
-}
-
-export function applyGen1OnlyFilter(list) {
-  return getGen1OnlyPref()
-    ? list.filter((p) => p.generation === "generation-i")
-    : list;
-}
-
-// 도감 "세대순" 정렬에서 쓰는 세대 필터. PokeAPI 의 generation-i ~ generation-ix
-// 문자열을 그대로 값으로 쓰고, 라벨만 한글로 보여준다.
-const GENERATION_ORDER = [
+// 도감 "세대순" 정렬과 퀴즈 출제 범위에서 쓰는 세대 목록. PokeAPI 의
+// generation-i ~ generation-ix 문자열을 그대로 값으로 쓰고, 라벨만 한글로 보여준다.
+export const GENERATION_ORDER = [
   "generation-i",
   "generation-ii",
   "generation-iii",
@@ -149,6 +123,42 @@ export const GENERATION_LABEL_KO = Object.fromEntries(
 export function getAllGenerations(list) {
   const set = new Set(list.map((p) => p.generation));
   return GENERATION_ORDER.filter((g) => set.has(g));
+}
+
+// 퀴즈 출제 범위를 고른 세대로 제한하는 설정(여러 세대 가능, 비우면 전체).
+// localStorage에 저장해 퀴즈 허브에서 고르면 이후 모든 퀴즈 모드에 반영한다.
+// 예전에는 "1세대만" 스위치(pokemonQuiz.gen1Only)였다 — 켜 둔 사람은 1세대 선택으로 이어받는다.
+const QUIZ_GENERATIONS_KEY = "pokemonQuiz.generations";
+const LEGACY_GEN1_ONLY_KEY = "pokemonQuiz.gen1Only";
+
+// 모르는 값·중복은 버리고 세대 순서로 맞춘다
+function normalizeGenerations(list) {
+  return GENERATION_ORDER.filter((g) => list.includes(g));
+}
+
+export function getQuizGenerationsPref() {
+  try {
+    const saved = localStorage.getItem(QUIZ_GENERATIONS_KEY);
+    if (saved === null) {
+      return localStorage.getItem(LEGACY_GEN1_ONLY_KEY) === "1" ? ["generation-i"] : [];
+    }
+    return normalizeGenerations(saved.split(","));
+  } catch {
+    return [];
+  }
+}
+
+export function setQuizGenerationsPref(generations) {
+  try {
+    localStorage.setItem(QUIZ_GENERATIONS_KEY, normalizeGenerations(generations).join(","));
+  } catch {
+    // localStorage 접근 불가 환경(시크릿 모드 등)에서는 조용히 무시
+  }
+}
+
+export function applyQuizGenerationFilter(list) {
+  const selected = getQuizGenerationsPref();
+  return selected.length ? list.filter((p) => selected.includes(p.generation)) : list;
 }
 
 // 도감의 정렬·세대 필터 선택을 기억해서, 앱을 다시 열어도 직전에 보던 화면이

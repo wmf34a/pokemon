@@ -8,7 +8,7 @@ import { LightbulbIcon } from "../components/Icons";
 import {
   loadPokemonData,
   pickRandom,
-  applyGen1OnlyFilter,
+  applyQuizGenerationFilter,
   SESSION_LENGTH,
   shuffle,
 } from "../utils/pokemonData";
@@ -47,8 +47,8 @@ export default function HintQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      // 1세대만 보기 설정을 그대로 따른다. 퀴즈마다 다르게 굴면 아이가 헷갈린다
-      setAll(applyGen1OnlyFilter(data));
+      // 출제 세대 설정을 그대로 따른다. 퀴즈마다 다르게 굴면 아이가 헷갈린다
+      setAll(applyQuizGenerationFilter(data));
     });
   }, []);
 

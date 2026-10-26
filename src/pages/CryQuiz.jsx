@@ -7,7 +7,7 @@ import {
   loadPokemonData,
   pickRandom,
   TYPE_LABEL_KO,
-  applyGen1OnlyFilter,
+  applyQuizGenerationFilter,
   SESSION_LENGTH,
   shuffle,
 } from "../utils/pokemonData";
@@ -41,7 +41,7 @@ export default function CryQuiz() {
 
   useEffect(() => {
     loadPokemonData().then((data) => {
-      setAll(applyGen1OnlyFilter(data.filter((p) => p.cry)));
+      setAll(applyQuizGenerationFilter(data.filter((p) => p.cry)));
     });
   }, []);
 
